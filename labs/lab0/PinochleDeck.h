@@ -3,8 +3,6 @@
 #include "Suit.h"
 #include <vector>
 
-#define COL 8 
-
 enum class PinochleRank{
     Nine,
     Jack,

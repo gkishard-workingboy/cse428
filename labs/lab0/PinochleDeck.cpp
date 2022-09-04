@@ -61,6 +61,6 @@ void PinochleDeck::print(std::ostream& os) {
         for (int j = 0; j < COL && i + j < cards.size(); ++j) {
             os << cards[i+j] << " ";
         }
-        os << endl;
+        os << std::endl;
     }
 }
