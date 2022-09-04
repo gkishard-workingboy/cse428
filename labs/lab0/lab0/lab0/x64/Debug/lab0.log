@@ -1,0 +1,5 @@
+﻿  card.cpp
+  Pinochle.cpp
+  Generating Code...
+Pinochle.obj : error LNK2019: unresolved external symbol "public: __cdecl Playcard<enum PinochleRank,enum suit>::Playcard<enum PinochleRank,enum suit>(enum PinochleRank,enum suit)" (??0?$Playcard@W4PinochleRank@@W4suit@@@@QEAA@W4PinochleRank@@W4suit@@@Z) referenced in function "public: __cdecl PinochleDeck::PinochleDeck(void)" (??0PinochleDeck@@QEAA@XZ)
+C:\Users\Haoyuan\Desktop\semester\c++\lab0\lab0\x64\Debug\lab0.exe : fatal error LNK1120: 1 unresolved externals
