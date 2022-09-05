@@ -1,5 +1,8 @@
+#ifndef _SUIT_H
+#define _SUIT_H
+
 #include <ostream>
-using namespace std;
+#include <string>
 
 enum class Suit{
     Clubs,
@@ -9,6 +12,8 @@ enum class Suit{
     undefined
 };
 
-char* to_string(const Suit&);
-ostream& operator<<(ostream&, const Suit&);
+std::string to_string(const Suit&);
+std::ostream& operator<<(std::ostream&, const Suit&);
 Suit& operator++(Suit&);
+
+#endif

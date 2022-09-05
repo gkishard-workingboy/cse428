@@ -1,3 +1,6 @@
+#ifndef _CARDT_H
+#define _CARDT_H
+
 #include <ostream>
 
 template<typename R, typename S>
@@ -10,3 +13,5 @@ public:
 
 template<typename R, typename S>
 std::ostream& operator<<(std::ostream&, const Card<R,S>&);
+
+#endif

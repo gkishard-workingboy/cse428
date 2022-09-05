@@ -1,6 +1,6 @@
 #include "Suit.h"
 
-char* to_string(const Suit& s) {
+std::string to_string(const Suit& s) {
     switch (s)
     {
     case Suit::Clubs:
@@ -18,7 +18,7 @@ char* to_string(const Suit& s) {
     }
 }
 
-ostream& operator<<(ostream& os, const Suit& s) {
+std::ostream& operator<<(std::ostream& os, const Suit& s) {
     os << to_string(s);
     return os;
 }

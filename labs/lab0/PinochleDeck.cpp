@@ -1,6 +1,6 @@
 #include "PinochleDeck.h"
 
-char* to_string(const PinochleRank& pr) {
+std::string to_string(const PinochleRank& pr) {
     switch (pr)
     {
     case PinochleRank::Nine:
@@ -31,14 +31,19 @@ PinochleRank& operator++(PinochleRank& pr) {
     {
     case PinochleRank::Nine:
         pr = PinochleRank::Jack;
+        break;
     case PinochleRank::Jack:
         pr = PinochleRank::Queen;
+        break;
     case PinochleRank::Queen:
         pr = PinochleRank::King;
+        break;
     case PinochleRank::King:
         pr = PinochleRank::Ten;
+        break;
     case PinochleRank::Ten:
         pr = PinochleRank::Ace;
+        break;
     case PinochleRank::Ace:
         pr = PinochleRank::undefined;
     default:
@@ -57,8 +62,9 @@ PinochleDeck::PinochleDeck() {
 };
 
 void PinochleDeck::print(std::ostream& os) {
-    for (int i = 0; i < cards.size(); i += COL) {
-        for (int j = 0; j < COL && i + j < cards.size(); ++j) {
+    int sz = cards.size();
+    for (int i = 0; i < sz; i += COL) {
+        for (int j = 0; j < COL && i + j < sz; ++j) {
             os << cards[i+j] << " ";
         }
         os << std::endl;

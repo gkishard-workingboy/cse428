@@ -1,6 +1,9 @@
-#include "Deck.h"
-#include "Card_T.h"
+#ifndef _PINOCHLEDECK_H
+#define _PINOCHLEDECK_H
+
 #include "Suit.h"
+#include "Card_T.h"
+#include "Deck.h"
 #include <vector>
 
 enum class PinochleRank{
@@ -13,7 +16,7 @@ enum class PinochleRank{
     undefined
 };
 
-char* to_string(const PinochleRank&);
+std::string to_string(const PinochleRank&);
 std::ostream& operator<<(std::ostream&, const PinochleRank&);
 PinochleRank& operator++(PinochleRank&);
 
@@ -24,3 +27,5 @@ public:
     PinochleDeck();
     virtual void print(std::ostream& os) override;
 };
+
+#endif

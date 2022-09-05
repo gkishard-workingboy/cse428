@@ -1,6 +1,6 @@
 #include "HoldEmDeck.h"
 
-char* to_string(const HoldEmRank& her) {
+std::string to_string(const HoldEmRank& her) {
     switch (her)
     {
     case HoldEmRank::Two:
@@ -32,7 +32,7 @@ char* to_string(const HoldEmRank& her) {
     case HoldEmRank::undefined:
         return "?";
     default:
-        return "not_exists"
+        return "not_exists";
     }
 }
 
@@ -97,8 +97,9 @@ HoldEmDeck::HoldEmDeck() {
 }
 
 void HoldEmDeck::print(std::ostream& os) {
-    for (int i = 0; i < cards.size(); i += COL) {
-        for (int j = 0; j < COL; ++j) {
+    int sz = cards.size();
+    for (int i = 0; i < sz; i += COL) {
+        for (int j = 0; j < COL && i + j < sz; ++j) {
             os << cards[i+j] << " ";
         }
         os << std::endl;
