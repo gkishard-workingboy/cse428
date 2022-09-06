@@ -17,15 +17,10 @@ public:
 };
 
 template<typename R, typename S>
-Card<R, S>::Card(R r, S s){
-    this->rank = r;
-    this->suit = s;
-}
+std::ostream& operator<<(std::ostream&, const Card<R, S>&);
 
-template<typename R, typename S>
-std::ostream& operator<<(std::ostream& os, const Card<R, S>& c) {
-    os << c.rank << c.suit;
-    return os;
-}
+#ifdef TEMPLATE_HEADERS_INCLUDE_SOURCE /* test whether guard symbol is defined */
+#include "Card_T.cpp"
+#endif
 
 #endif

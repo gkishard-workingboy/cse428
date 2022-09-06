@@ -13,7 +13,7 @@ TMPL_SRCS	= Card_T.cpp
 HEADER_FILES    = Suit.h Card_T.h Deck.h PinochleDeck.h HoldEmDeck.h 
 
 #               Any special flags that should be set for compilation
-SPECIAL_FLAGS  = -std=c++17 -DTEMPLATE_HEARDERS_INCLUDE_SOURCE 
+SPECIAL_FLAGS  = -std=c++17 -DTEMPLATE_HEADERS_INCLUDE_SOURCE 
 #SPECIAL_FLAGS  = -std=c++17
 
 #               Any additional libraries that need to be linked in (e.g., -lsocket -lnsl)
