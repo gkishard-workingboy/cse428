@@ -71,7 +71,7 @@ HoldEmRank& operator++(HoldEmRank& her) {
         her = HoldEmRank::Jack;
         break;
     case HoldEmRank::Jack:
-        her = HoldEmRank::Jack;
+        her = HoldEmRank::Queen;
         break;
     case HoldEmRank::Queen:
         her = HoldEmRank::King;

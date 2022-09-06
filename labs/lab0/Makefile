@@ -39,7 +39,7 @@ DEFFLAGS  = -DUNIX
 
 #               Any general flags that should be set for the compiler
 #               NOTE: to optimize fully, change -g to -O4
-CXXFLAGS  =     -Wall -W -g $(SPECIAL_FLAGS)
+CXXFLAGS  = -Wall -W -g $(SPECIAL_FLAGS)
 
 #               Any -I directories in which there are .h files that should be included
 INCFLAGS  =
