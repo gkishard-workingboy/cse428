@@ -99,10 +99,12 @@ HoldEmRank &operator++(HoldEmRank &her)
 
 HoldEmDeck::HoldEmDeck()
 {
+    // Nested loop in this manner will gather those cards with same rank togather.
     for (HoldEmRank her = HoldEmRank::Two; her != HoldEmRank::undefined; ++her)
     {
         for (Suit s = Suit::Clubs; s != Suit::undefined; ++s)
         {
+            // emplace() and emplace_back() will implicitly call the constructor of the class of value type.
             this->cards.emplace_back(her, s);
         }
     }
@@ -111,6 +113,7 @@ HoldEmDeck::HoldEmDeck()
 void HoldEmDeck::print(std::ostream &os)
 {
     int sz = cards.size();
+    // Maximum COL cards will be printed per row.
     for (int i = 0; i < sz; i += COL)
     {
         for (int j = 0; j < COL && i + j < sz; ++j)

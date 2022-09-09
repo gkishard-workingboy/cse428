@@ -63,10 +63,12 @@ PinochleRank &operator++(PinochleRank &pr)
 
 PinochleDeck::PinochleDeck()
 {
+    // Nested loop in this manner will gather those cards with same rank togather.
     for (PinochleRank pr = PinochleRank::Nine; pr != PinochleRank::undefined; ++pr)
     {
         for (Suit s = Suit::Clubs; s != Suit::undefined; ++s)
         {
+            // emplace() and emplace_back() will implicitly call the constructor of the class of value type.
             this->cards.emplace_back(pr, s);
             this->cards.emplace_back(pr, s);
         }
@@ -76,6 +78,7 @@ PinochleDeck::PinochleDeck()
 void PinochleDeck::print(std::ostream &os)
 {
     int sz = cards.size();
+    // Maximum COL cards will be printed per row.
     for (int i = 0; i < sz; i += COL)
     {
         for (int j = 0; j < COL && i + j < sz; ++j)

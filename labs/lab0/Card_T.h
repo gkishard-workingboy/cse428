@@ -4,8 +4,8 @@
  * @Description: Declaration of template struct Card with corresponding template shift operator. This file includes the cpp file containing definition to items above.
  *
  */
-#ifndef _CARDT_H
-#define _CARDT_H
+#ifndef _CARD_T_H
+#define _CARD_T_H
 
 #include <ostream>
 

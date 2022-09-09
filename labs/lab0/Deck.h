@@ -9,6 +9,7 @@
 
 #include <ostream>
 
+// COL is used for control maximum number of cards will be printed per row, this can also be implemented as a property in class.
 #define COL 8
 
 class Deck

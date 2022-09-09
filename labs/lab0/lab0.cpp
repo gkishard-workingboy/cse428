@@ -11,7 +11,9 @@
 #include <iostream>
 using namespace std;
 
-int main(void)
+const int SUCCESS = 0;
+
+int main(int, char *[])
 {
     PinochleDeck pd;
     HoldEmDeck hd;
@@ -20,5 +22,5 @@ int main(void)
     cout << "Texas hold'em Deck: " << endl;
     hd.print(cout);
 
-    return 0;
+    return SUCCESS;
 }
