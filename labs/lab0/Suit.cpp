@@ -1,6 +1,13 @@
+/*
+ * @File: Suit.cpp
+ * @Author: Zhikuan Wei w.zhikuan@wustl.edu
+ * @Description: Definition of enumeration class Suit and corresponding shift and prefix increment operator.
+ *
+ */
 #include "Suit.h"
 
-std::string to_string(const Suit& s) {
+std::string to_string(const Suit &s)
+{
     switch (s)
     {
     case Suit::Clubs:
@@ -18,12 +25,14 @@ std::string to_string(const Suit& s) {
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const Suit& s) {
+std::ostream &operator<<(std::ostream &os, const Suit &s)
+{
     os << to_string(s);
     return os;
 }
 
-Suit& operator++(Suit& s) {
+Suit &operator++(Suit &s)
+{
     switch (s)
     {
     case Suit::Clubs:

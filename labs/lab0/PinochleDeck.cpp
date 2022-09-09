@@ -1,6 +1,13 @@
+/*
+ * @File: PinochleDeck.cpp
+ * @Author: Zhikuan Wei w.zhikuan@wustl.edu
+ * @Description: Definition of enumeration class PinochleRank with corresponding shift and prefix increment operator, class PinochleDeck inherited from Deck.
+ *
+ */
 #include "PinochleDeck.h"
 
-std::string to_string(const PinochleRank& pr) {
+std::string to_string(const PinochleRank &pr)
+{
     switch (pr)
     {
     case PinochleRank::Nine:
@@ -22,11 +29,13 @@ std::string to_string(const PinochleRank& pr) {
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const PinochleRank& pr) {
+std::ostream &operator<<(std::ostream &os, const PinochleRank &pr)
+{
     return os << to_string(pr);
 }
 
-PinochleRank& operator++(PinochleRank& pr) {
+PinochleRank &operator++(PinochleRank &pr)
+{
     switch (pr)
     {
     case PinochleRank::Nine:
@@ -52,20 +61,26 @@ PinochleRank& operator++(PinochleRank& pr) {
     return pr;
 }
 
-PinochleDeck::PinochleDeck() {
-    for (PinochleRank pr = PinochleRank::Nine; pr != PinochleRank::undefined; ++pr) {
-        for (Suit s = Suit::Clubs; s != Suit::undefined; ++s) {
+PinochleDeck::PinochleDeck()
+{
+    for (PinochleRank pr = PinochleRank::Nine; pr != PinochleRank::undefined; ++pr)
+    {
+        for (Suit s = Suit::Clubs; s != Suit::undefined; ++s)
+        {
             this->cards.emplace_back(pr, s);
             this->cards.emplace_back(pr, s);
         }
     }
 };
 
-void PinochleDeck::print(std::ostream& os) {
+void PinochleDeck::print(std::ostream &os)
+{
     int sz = cards.size();
-    for (int i = 0; i < sz; i += COL) {
-        for (int j = 0; j < COL && i + j < sz; ++j) {
-            os << cards[i+j] << " ";
+    for (int i = 0; i < sz; i += COL)
+    {
+        for (int j = 0; j < COL && i + j < sz; ++j)
+        {
+            os << cards[i + j] << " ";
         }
         os << std::endl;
     }

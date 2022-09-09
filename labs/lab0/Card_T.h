@@ -1,23 +1,25 @@
+/*
+ * @File: Card_T.h
+ * @Author: Zhikuan Wei w.zhikuan@wustl.edu
+ * @Description: Declaration of template struct Card with corresponding template shift operator. This file includes the cpp file containing definition to items above.
+ *
+ */
 #ifndef _CARDT_H
 #define _CARDT_H
 
 #include <ostream>
 
-// template<typename R, typename S> struct Card;
-
-// template<typename R, typename S>
-// std::ostream& operator<<(std::ostream&, const Card<R,S>&);
-
-template<typename R, typename S>
-struct Card{
+template <typename R, typename S>
+struct Card
+{
 public:
 	R rank;
 	S suit;
 	Card(R, S);
 };
 
-template<typename R, typename S>
-std::ostream& operator<<(std::ostream&, const Card<R, S>&);
+template <typename R, typename S>
+std::ostream &operator<<(std::ostream &, const Card<R, S> &);
 
 #ifdef TEMPLATE_HEADERS_INCLUDE_SOURCE /* test whether guard symbol is defined */
 #include "Card_T.cpp"

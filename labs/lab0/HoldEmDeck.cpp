@@ -1,6 +1,13 @@
+/*
+ * @File: HoldEmDeck.cpp
+ * @Author: Zhikuan Wei w.zhikuan@wustl.edu
+ * @Description: Definition of enumeration class HoldEmRank with corresponding shift and prefix increment operator, class HoldEmDeck inherited from Deck.
+ *
+ */
 #include "HoldEmDeck.h"
 
-std::string to_string(const HoldEmRank& her) {
+std::string to_string(const HoldEmRank &her)
+{
     switch (her)
     {
     case HoldEmRank::Two:
@@ -36,11 +43,13 @@ std::string to_string(const HoldEmRank& her) {
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const HoldEmRank& her) {
+std::ostream &operator<<(std::ostream &os, const HoldEmRank &her)
+{
     return os << to_string(her);
 }
 
-HoldEmRank& operator++(HoldEmRank& her) {
+HoldEmRank &operator++(HoldEmRank &her)
+{
     switch (her)
     {
     case HoldEmRank::Two:
@@ -88,19 +97,25 @@ HoldEmRank& operator++(HoldEmRank& her) {
     return her;
 }
 
-HoldEmDeck::HoldEmDeck() {
-    for (HoldEmRank her = HoldEmRank::Two; her != HoldEmRank::undefined; ++her) {
-        for (Suit s = Suit::Clubs; s != Suit::undefined; ++s) {
+HoldEmDeck::HoldEmDeck()
+{
+    for (HoldEmRank her = HoldEmRank::Two; her != HoldEmRank::undefined; ++her)
+    {
+        for (Suit s = Suit::Clubs; s != Suit::undefined; ++s)
+        {
             this->cards.emplace_back(her, s);
         }
     }
 }
 
-void HoldEmDeck::print(std::ostream& os) {
+void HoldEmDeck::print(std::ostream &os)
+{
     int sz = cards.size();
-    for (int i = 0; i < sz; i += COL) {
-        for (int j = 0; j < COL && i + j < sz; ++j) {
-            os << cards[i+j] << " ";
+    for (int i = 0; i < sz; i += COL)
+    {
+        for (int j = 0; j < COL && i + j < sz; ++j)
+        {
+            os << cards[i + j] << " ";
         }
         os << std::endl;
     }
