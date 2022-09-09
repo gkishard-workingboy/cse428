@@ -38,7 +38,6 @@ QC QD QH QS KC KD KH KS
 AC AD AH AS 
 
 Design Decisions:
-
-In the PinochleDeck constructor, we pushed cards to the card vector using nested loops. The inner loop incremented the suit and the outer loop incremented the rank. This way, cards with the same rank will be grouped together. 
-In the print() function for this class, we added a line break after every 8 cards so that cards of the same rank will be printed on the same line. 
-The number of cards will be printed per row is controlled by the macro "COL" defined in Deck.h, where we think that since all subclass will include this file so that it is easy to control the behavior of all inherited print() function.
+In the PinochleDeck and HoldEmDeck constructors, we pushed cards to the card vector using nested loops. The inner loop incremented the suit and the outer loop incremented the rank. This way, cards with the same rank will be grouped together. 
+In the print() function for both classes, we added a line break after every 8 cards so that cards of the same rank will be printed on the same line. 
+The number of cards printed per row is controlled by the macro "COL" defined in Deck.h, where we think that since all subclass will include this file it is easy to control the behavior of all inherited print() function.
