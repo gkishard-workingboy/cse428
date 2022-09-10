@@ -1,7 +1,7 @@
 LAB0
 Team member
 Zhikuan Wei(w.zhikuan@wustl.edu)
-Haoyuan Ye
+Haoyuan Ye(haoyuan.y@wustl.edu)
 Julia Zeng(julia.z@wustl.edu)
 
 Errors and Warnings:
