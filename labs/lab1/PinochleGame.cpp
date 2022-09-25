@@ -2,8 +2,8 @@
  * @FilePath: /428cpp/labs/lab1/PinochleGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-25 14:31:48
- * @LastEditTime: 2022-09-25 16:06:04
- * @Description:
+ * @LastEditTime: 2022-09-25 16:11:35
+ * @Description: Definition to PinochleGame.h
  *
  */
 
