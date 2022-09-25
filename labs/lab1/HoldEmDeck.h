@@ -7,9 +7,8 @@
 #ifndef _HOLDEMDECK_H
 #define _HOLDEMDECK_H
 
-#include "Deck.h"
-#include "Card_T.h"
 #include "Suit.h"
+#include "Deck_T.h"
 #include <vector>
 
 enum class HoldEmRank
@@ -34,14 +33,10 @@ std::string to_string(const HoldEmRank &);
 std::ostream &operator<<(std::ostream &, const HoldEmRank &);
 HoldEmRank &operator++(HoldEmRank &);
 
-class HoldEmDeck : public Deck
+class HoldEmDeck : public Deck<HoldEmRank, Suit>
 {
-private:
-    std::vector<Card<HoldEmRank, Suit>> cards;
-
 public:
     HoldEmDeck();
-    virtual void print(std::ostream &) override;
 };
 
 #endif
