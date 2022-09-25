@@ -7,7 +7,7 @@ EXECUTABLE	= lab1.out
 CMPL_SRCS	= Suit.cpp PinochleDeck.cpp HoldEmDeck.cpp lab1.cpp
 
 #               Source files containing only template class method definitions
-TMPL_SRCS	= Card_T.cpp CardSet_T.cpp
+TMPL_SRCS	= Card_T.cpp CardSet_T.cpp Deck_T.cpp
 
 #               Header (.h) files
 HEADER_FILES    = Suit.h Card_T.h CardSet_T.h Deck_T.h PinochleDeck.h HoldEmDeck.h 

@@ -1,8 +1,8 @@
 /*
- * @FilePath: lab1.cpp
+ * @FilePath: /428cpp/labs/lab1/lab1.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-24 21:48:13
- * @LastEditTime: 2022-09-24 23:04:49
+ * @LastEditTime: 2022-09-25 13:27:06
  * @Description: This file contains the main function for testing
  * the functionality of two kinds of decks.
  */
@@ -23,6 +23,9 @@ int main(int, char *[])
     cout << "Pinochle Deck: " << endl;
     pd.print(cout, PinC);
     cout << "Texas hold'em Deck: " << endl;
+    hd.print(cout, HolC);
+    cout << "Texas hold'em Deck shuffled: " << endl;
+    hd.shuffle();
     hd.print(cout, HolC);
 
     return SUCCESS;
