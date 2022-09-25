@@ -1,0 +1,14 @@
+# all studio files should be ignored.
+/studio*/
+
+# resources files should be ignored.
+/resources/
+
+# IDE generated config dir should be ignored.
+.vscode/
+
+*.out
+*DSYM/
+*zip*
+.DS_Store
+*.tmp

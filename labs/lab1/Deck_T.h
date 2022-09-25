@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab1/Deck_T.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-24 21:48:13
- * @LastEditTime: 2022-09-25 13:29:30
+ * @LastEditTime: 2022-09-25 14:10:50
  * @Description: Declaration of class Deck derived public from CardSet with same template parameterized.
  *
  */
@@ -21,6 +21,8 @@ public:
     Deck();
     // shuffle cards
     void shuffle();
+    // collect
+    void collect(CardSet<R, S> &);
 
 private:
     // non-deterministic

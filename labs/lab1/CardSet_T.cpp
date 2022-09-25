@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab1/CardSet_T.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-24 22:18:12
- * @LastEditTime: 2022-09-25 11:11:29
+ * @LastEditTime: 2022-09-25 14:13:12
  * @Description: Source file contains the definition belongs to CardSet_T.h
  *
  */
@@ -28,4 +28,30 @@ void CardSet<R, S>::print(std::ostream &os, std::size_t col)
     {
         os << std::endl;
     }
+}
+
+template <typename R, typename S>
+CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
+{
+    // throw exception if cards is empty
+    if (CardSet<R, S>::cards.empty())
+    {
+        // ! alert: throw of runtime error
+        throw std::runtime_error("Error: the left-hand side CardSet does not have any cards left.");
+    }
+    // get the reference to the last card of current cards
+    auto &card = CardSet<R, S>::cards.back();
+    // push onto the back of rhs's cards.
+    rhs.cards.push_back(card);
+    // pop last card
+    CardSet<R, S>::cards.pop_back();
+
+    // return reference to this.
+    return *this;
+}
+
+template <typename R, typename S>
+bool CardSet<R, S>::isEmpty()
+{
+    return CardSet<R, S>::cards.empty();
 }
