@@ -13,6 +13,7 @@
 #include <vector>
 #include <ostream>
 #include <stdexcept>
+#include <new>
 
 // Base class for Deck
 template <typename R, typename S>
