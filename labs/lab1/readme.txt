@@ -92,4 +92,4 @@ Would you like to end the current game?
 Like in Pinochle, typing "yes" ends the game.
 
 Design Decisions:
-
+In the main function, we pass the argv to the Game constructor without modifying it. The Game constructor iterates through argv starting at index 2 so that only player names are added to the member vector. We chose this approach because argv was const and could not be modified directly.
