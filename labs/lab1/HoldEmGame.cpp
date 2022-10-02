@@ -6,7 +6,7 @@ const int flopCards = 3;
 const int turnCards = 4;
 const int riverCards = 5;
 
-HoldEmGame::HoldEmGame(int argc, char* argv[]) : Game(argc, argv) {
+HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv) {
 	this->state = HoldEmState::preflop;
     // create as many hands as players in the game
     for (int i = 0; i < argc; ++i)

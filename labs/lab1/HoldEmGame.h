@@ -4,8 +4,7 @@
 #include "Suit.h"
 #include "HoldEmDeck.h"
 #include <vector>
-#include <ostream>
-#include <istream>
+#include <iostream>
 using namespace std;
 
 enum class HoldEmState { preflop, flop, turn, river, undefined };
@@ -18,6 +17,6 @@ protected:
 	CardSet<HoldEmRank, Suit> board;
 	virtual void deal();
 public:
-	HoldEmGame(int, char* []);
+	HoldEmGame(int, const char* []);
 	virtual int play() override;
 };
