@@ -9,10 +9,18 @@ Errors:
 "invalid conversion from ‘char**’ to ‘const char**’" - This happened when we made the argv parameter of main() a const char**, but the functions that took argv as a parameter still treated argv as a non-const char**. We fixed it by making the argv argument const for every function that used it.
 
 Warnings:
-
+When I got the ‘char**’ to ‘const char**’ error, I also got a warning saying "note:   initializing argument 2 of ‘HoldEmGame::HoldEmGame(int, char**)’". This was fixed by modifying all functions that took argv as an input to take a const char** instead of a char**.
 
 Incorrect Output:
+When I was writing the program's behavior for misformed command lines, I got the following output:
 
+Usage: ./lab1.out <Game> <Player Names>
+Game can be 'Pinochle' or 'HoldEm'.
+If the game is Pinochle, there must be 4 player names.
+If the game is HoldEm, there must be between 2 and 9 player names.
+Segmentation fault (core dumped)
+
+This output included the usage message as expected, but also caused a segmentation fault. I had forgotten to add code to return a non-zero value after printing the usage message. This problem was fixed after adding that code.
 
 Behavior of Executable Program:
 
