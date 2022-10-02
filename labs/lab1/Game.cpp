@@ -6,10 +6,9 @@
  * @Description: Definition to Game.h
  *
  */
-
 #include "Game.h"
 
-Game::Game(int argc, char *argv[])
+Game::Game(int argc, const char *argv[])
 {
     // * DESIGN CHOICE
     // * the index start from 2
