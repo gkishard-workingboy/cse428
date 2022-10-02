@@ -32,9 +32,9 @@ shared_ptr<Game> create(int argc, const char *argv[]){
     if(strcmp(argv[GAME_NAME], "Pinochle") == 0){
         game = make_shared<PinochleGame>(argc, argv);
     }
-    if(strcmp(argv[GAME_NAME], "HoldEm") == 0){
+    /*if(strcmp(argv[GAME_NAME], "HoldEm") == 0){
         game = make_shared<HoldEmGame>(argc, argv);
-    }
+    }*/
     return game;
 }
 
@@ -73,7 +73,7 @@ int main(int argc, const char *argv[])
     try
     {
         // print out Pinochle deck
-        cout << "Pinochle Deck: " << endl;
+        /*cout << "Pinochle Deck: " << endl;
         pd.print(cout, PinC);
         // print out Hold'em deck
         cout << "Texas hold'em Deck: " << endl;
@@ -87,8 +87,8 @@ int main(int argc, const char *argv[])
         hd >> cs;
         cs.print(cout, HolC);
         // test for PinochleGame
-        cout << endl;
-        // TODO: Replace inline literal in future
+        cout << endl;*/
+        
         shared_ptr<Game> game = create(argc, argv);
         if(game){
             game.play();
