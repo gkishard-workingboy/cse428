@@ -50,7 +50,7 @@ JH QS QC JD
 
 >>> Do you wish to stop playing? (yes/*) 
 
-As expected, each player is dealt 12 cards. Each player is displayed in the same order as in the input. Typing any string other than "yes" (here, I typed "no") results in a new distribution of the cards, such as the one below:
+As expected, each player is dealt 12 cards. Each player is displayed in the same order as in the input. Typing any string other than "yes" (here, I typed "no") generates a different distribution of the cards. In this case, I got this new distribution:
 
 player name: player1
 AD 9H 10D 9C JC JS 9D AH 
@@ -79,7 +79,7 @@ BOARD (turn): AH 4D QD QH
 BOARD (river): AH 4D QD QH 3S 
 Would you like to end the current game?
 
-As expected, each player is dealt 2 cards. Each player is displayed in the same order as in the input. The board has 3 cards in the flop state. A 4th card is added to the board in the turn state, and a 5th card is added in the river state. Typing any string other than "yes" (here, I typed "no") results in a new distribution of the cards, such as the one below:
+As expected, each player is dealt 2 cards. Each player is displayed in the same order as in the input. The board has 3 cards in the flop state. A 4th card is added to the board in the turn state, and a 5th card is added in the river state. Typing any string other than "yes" (here, I typed "no") generates a different distribution of the cards. In this case, I got this new distribution:
 
 player name: player1  AH 8S 
 player name: player2  QS JC 
