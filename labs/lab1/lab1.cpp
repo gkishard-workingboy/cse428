@@ -52,8 +52,7 @@ int main(int argc, const char *argv[])
         // test for PinochleGame
         cout << endl;
         // TODO: Replace inline literal in future
-        char *pinochleNames[] = argv + 2;
-        PinochleGame pg(argc - 2, pinochleNames);
+        PinochleGame pg(argc, argv);
         pg.play();
     }
     catch (const std::exception &e)
