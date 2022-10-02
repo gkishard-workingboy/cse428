@@ -10,6 +10,7 @@
 #include "PinochleDeck.h"
 #include "HoldEmDeck.h"
 #include "PinochleGame.h"
+#include "HoldEmGame.h"
 #include <iostream>
 #include <exception>
 #include <cstring>
@@ -32,9 +33,9 @@ shared_ptr<Game> create(int argc, const char *argv[]){
     if(strcmp(argv[GAME_NAME], "Pinochle") == 0){
         game = make_shared<PinochleGame>(argc, argv);
     }
-    /*if(strcmp(argv[GAME_NAME], "HoldEm") == 0){
+    if(strcmp(argv[GAME_NAME], "HoldEm") == 0){
         game = make_shared<HoldEmGame>(argc, argv);
-    }*/
+    }
     return game;
 }
 
