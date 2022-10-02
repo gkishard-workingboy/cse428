@@ -14,12 +14,22 @@
 #include <exception>
 using namespace std;
 
+const int PROGRAM_NAME = 1;
+const int baseArgs = 2;
+const int pinochleArgs = baseArgs + 4;
+const int holdEmMinArgs = baseArgs + 2;
+const int holdEmMaxArgs = baseArgs + 9;
 const int SUCCESS = 0;
+const int USAGE = 1;
 const int PinC = 8;
 const int HolC = 13;
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
+    if(argc < baseArgs){
+        cout << "Usage: ";
+    }
+    
     // last try-catch to stop exception propagation.
     try
     {
@@ -42,7 +52,8 @@ int main(int argc, char *argv[])
         // test for PinochleGame
         cout << endl;
         // TODO: Replace inline literal in future
-        PinochleGame pg(argc - 2, argv + 2);
+        char *pinochleNames[] = argv + 2;
+        PinochleGame pg(argc - 2, pinochleNames);
         pg.play();
     }
     catch (const std::exception &e)
