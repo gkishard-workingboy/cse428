@@ -91,7 +91,7 @@ int main(int argc, const char *argv[])
         
         shared_ptr<Game> game = create(argc, argv);
         if(game){
-            *game.play();
+            (*game).play();
         }
         else {
             cout << "Error: invalid pointer to game" << endl;
