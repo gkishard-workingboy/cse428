@@ -11,10 +11,10 @@
 #include <iostream>
 #include <string>
 
-PinochleGame::PinochleGame(int argc, char *argv[]) : Game(argc, argv)
+PinochleGame::PinochleGame(int argc, const char *argv[]) : Game(argc, argv)
 {
     // create as many hands as players in the game
-    for (int i = 0; i < argc; ++i)
+    for (int i = 2; i < argc; ++i)
     {
         // will call default constructor of CardSet
         hands.emplace_back();
