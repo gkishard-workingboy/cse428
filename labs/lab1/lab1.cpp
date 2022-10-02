@@ -12,6 +12,7 @@
 #include "PinochleGame.h"
 #include <iostream>
 #include <exception>
+#include <cstring>
 using namespace std;
 
 const int PROGRAM_NAME = 1;
