@@ -20,7 +20,7 @@
 class PinochleGame : public Game
 {
 public:
-    PinochleGame(int, char *[]);
+    PinochleGame(int, const char *[]);
     // virtual function: how to play Pinochle Game
     virtual int play() override;
 
