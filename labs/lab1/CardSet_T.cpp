@@ -41,11 +41,19 @@ CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
     }
     // get the reference to the last card of current cards
     auto &card = CardSet<R, S>::cards.back();
-    // push onto the back of rhs's cards.
-    rhs.cards.push_back(card);
-    // pop last card
-    CardSet<R, S>::cards.pop_back();
-
+    
+    try {
+        // push onto the back of rhs's cards.
+        rhs.cards.push_back(card);
+        // pop last card
+        CardSet<R, S>::cards.pop_back();
+    }
+    catch (const std::badalloc& exception) {
+        std::cout << "bad allocation failure " << exception.what() << std::endl;
+    }
+    catch (const std::exception& exception) {
+        std::cout << "failed " << exception.what() << std::endl;
+    }
     // return reference to this.
     return *this;
 }

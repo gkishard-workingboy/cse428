@@ -41,6 +41,27 @@ void HoldEmGame::deal() {
     }
 }
 
+void HoldEmGame::collectAll()
+{
+    size_t numPlayer = players.size();
+    // collect cards from each player hand
+    for (size_t i = 0; i < numPlayer; ++i)
+    {
+        deck.collect(hands[i]);
+    }
+}
+
+void HoldEmGame::print(std::ostream& os, const std::size_t rc)
+{
+    int numPlayer = players.size();
+    // print each player's status
+    for (int i = 0; i < numPlayer; ++i)
+    {
+        os << "player name: " << players[i] << std::endl;
+        hands[i].print(os, rc);
+    }
+}
+
 int HoldEmGame::play() {
     //shuffle card set state to preflop
     deck.shuffle();
@@ -48,10 +69,8 @@ int HoldEmGame::play() {
     //deal the card to players
     this->deal();
     //print each player info and hand
-    for (size_t i = 0; i < players.size(); i++) {
-        cout << "player name: " << players[i] << "  ";
-        hands[i].print(cout, handCards);
-    }
+
+    print(cout, handCards);
 
     //deal 3 flop cards to board
     this->deal();
@@ -69,10 +88,7 @@ int HoldEmGame::play() {
     board.print(cout, riverCards);
 
     //collect hands and board
-    for (size_t i = 0; i < players.size(); i++) {
-        deck.collect(hands[i]);
-    }
-    deck.collect(board);
+    collectAll();
     
     cout << "Would you like to end the current game?" << endl;
     string userInput;
