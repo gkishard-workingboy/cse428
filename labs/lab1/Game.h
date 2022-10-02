@@ -17,7 +17,7 @@
 class Game
 {
 public:
-    Game(int, char *[]);
+    Game(int, const char *[]);
     // pure virtual function play
     virtual int play() = 0;
 
