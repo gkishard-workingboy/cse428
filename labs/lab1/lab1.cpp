@@ -13,17 +13,30 @@
 #include <iostream>
 #include <exception>
 #include <cstring>
+#include <memory>
 using namespace std;
 
-const int PROGRAM_NAME = 1;
+const int GAME_NAME = 1;
 const int baseArgs = 2;
 const int pinochlePlayers = 4;
 const int holdEmMinPlayers = 2;
 const int holdEmMaxPlayers = 9;
 const int SUCCESS = 0;
 const int USAGE = 1;
+const int INVALID_POINTER = 2;
 const int PinC = 8;
 const int HolC = 13;
+
+shared_ptr<Game> create(int argc, const char *argv[]){
+    shared_ptr<Game> game;
+    if(strcmp(argv[GAME_NAME], "Pinochle") == 0){
+        game = make_shared<PinochleGame>(argc, argv);
+    }
+    if(strcmp(argv[GAME_NAME], "HoldEm") == 0){
+        game = make_shared<HoldEmGame>(argc, argv);
+    }
+    return game;
+}
 
 int main(int argc, const char *argv[])
 {
@@ -34,21 +47,21 @@ int main(int argc, const char *argv[])
         cout << "If the game is HoldEm, there must be between 2 and 9 player names." << endl;
         return USAGE;
     }
-    if(strcmp(argv[PROGRAM_NAME], "Pinochle") != 0 && strcmp(argv[PROGRAM_NAME], "HoldEm") != 0){
+    if(strcmp(argv[GAME_NAME], "Pinochle") != 0 && strcmp(argv[GAME_NAME], "HoldEm") != 0){
         cout << "Usage: ./lab1.out <Game> <Player Names>"<< endl;
         cout << "Game can be 'Pinochle' or 'HoldEm'." << endl;
         cout << "If the game is Pinochle, there must be 4 player names." << endl;
         cout << "If the game is HoldEm, there must be between 2 and 9 player names." << endl;
         return USAGE;
     }
-    if(strcmp(argv[PROGRAM_NAME], "Pinochle") == 0 && argc != baseArgs + pinochlePlayers){
+    if(strcmp(argv[GAME_NAME], "Pinochle") == 0 && argc != baseArgs + pinochlePlayers){
         cout << "Usage: ./lab1.out <Game> <Player Names>"<< endl;
         cout << "Game can be 'Pinochle' or 'HoldEm'." << endl;
         cout << "If the game is Pinochle, there must be 4 player names." << endl;
         cout << "If the game is HoldEm, there must be between 2 and 9 player names." << endl;
         return USAGE;
     }
-    if(strcmp(argv[PROGRAM_NAME], "HoldEm") == 0 && (argc < baseArgs + holdEmMinPlayers || argc > baseArgs + holdEmMaxPlayers)){
+    if(strcmp(argv[GAME_NAME], "HoldEm") == 0 && (argc < baseArgs + holdEmMinPlayers || argc > baseArgs + holdEmMaxPlayers)){
         cout << "Usage: ./lab1.out <Game> <Player Names>"<< endl;
         cout << "Game can be 'Pinochle' or 'HoldEm'." << endl;
         cout << "If the game is Pinochle, there must be 4 player names." << endl;
@@ -59,8 +72,6 @@ int main(int argc, const char *argv[])
     // last try-catch to stop exception propagation.
     try
     {
-        PinochleDeck pd;
-        HoldEmDeck hd;
         // print out Pinochle deck
         cout << "Pinochle Deck: " << endl;
         pd.print(cout, PinC);
@@ -78,8 +89,14 @@ int main(int argc, const char *argv[])
         // test for PinochleGame
         cout << endl;
         // TODO: Replace inline literal in future
-        PinochleGame pg(argc, argv);
-        pg.play();
+        shared_ptr<Game> game = create(argc, argv);
+        if(game){
+            game.play();
+        }
+        else {
+            cout << "Error: invalid pointer to game" << endl;
+            return INVALID_POINTER;
+        }
     }
     catch (const std::exception &e)
     {
