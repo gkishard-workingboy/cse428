@@ -48,7 +48,7 @@ CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
         // pop last card
         CardSet<R, S>::cards.pop_back();
     }
-    catch (const std::badalloc& exception) {
+    catch (const std::bad_alloc& exception) {
         std::cout << "bad allocation failure " << exception.what() << std::endl;
     }
     catch (const std::exception& exception) {

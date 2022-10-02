@@ -11,7 +11,7 @@
 #define _CardSet_T_H
 #include "Card_T.h"
 #include <vector>
-#include <ostream>
+#include <iostream>
 #include <stdexcept>
 #include <new>
 
