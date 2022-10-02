@@ -16,9 +16,9 @@ using namespace std;
 
 const int PROGRAM_NAME = 1;
 const int baseArgs = 2;
-const int pinochleArgs = baseArgs + 4;
-const int holdEmMinArgs = baseArgs + 2;
-const int holdEmMaxArgs = baseArgs + 9;
+const int pinochlePlayers = 4;
+const int holdEmMinPlayers = 2;
+const int holdEmMaxPlayers = 9;
 const int SUCCESS = 0;
 const int USAGE = 1;
 const int PinC = 8;
@@ -27,9 +27,34 @@ const int HolC = 13;
 int main(int argc, const char *argv[])
 {
     if(argc < baseArgs){
-        cout << "Usage: ";
+        cout << "Usage: ./lab1.out <Game> <Player Names>"<< endl;
+        cout << "Game can be 'Pinochle' or 'HoldEm'." << endl;
+        cout << "If the game is Pinochle, there must be 4 player names." << endl;
+        cout << "If the game is HoldEm, there must be between 2 and 9 player names." << endl;
+        return USAGE;
     }
-    
+    if(strcmp(argv[PROGRAM_NAME], "Pinochle") != 0 && strcmp(argv[PROGRAM_NAME], "HoldEm") != 0){
+        cout << "Usage: ./lab1.out <Game> <Player Names>"<< endl;
+        cout << "Game can be 'Pinochle' or 'HoldEm'." << endl;
+        cout << "If the game is Pinochle, there must be 4 player names." << endl;
+        cout << "If the game is HoldEm, there must be between 2 and 9 player names." << endl;
+        return USAGE;
+    }
+    if(strcmp(argv[PROGRAM_NAME], "Pinochle") == 0 && argc != baseArgs + pinochlePlayers){
+        cout << "Usage: ./lab1.out <Game> <Player Names>"<< endl;
+        cout << "Game can be 'Pinochle' or 'HoldEm'." << endl;
+        cout << "If the game is Pinochle, there must be 4 player names." << endl;
+        cout << "If the game is HoldEm, there must be between 2 and 9 player names." << endl;
+        return USAGE;
+    }
+    if(strcmp(argv[PROGRAM_NAME], "HoldEm") == 0 && (argc < baseArgs + holdEmMinPlayers || argc > baseArgs + holdEmMaxPlayers)){
+        cout << "Usage: ./lab1.out <Game> <Player Names>"<< endl;
+        cout << "Game can be 'Pinochle' or 'HoldEm'." << endl;
+        cout << "If the game is Pinochle, there must be 4 player names." << endl;
+        cout << "If the game is HoldEm, there must be between 2 and 9 player names." << endl;
+        return USAGE;
+    }
+
     // last try-catch to stop exception propagation.
     try
     {
