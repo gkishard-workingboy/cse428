@@ -16,6 +16,10 @@ protected:
 	vector<CardSet<HoldEmRank, Suit> > hands;
 	CardSet<HoldEmRank, Suit> board;
 	virtual void deal();
+	// * DESIGN:
+	// * modularize play() by extract parts to 2 member methods
+	void collectAll();
+	void print(std::ostream&, const std::size_t);
 public:
 	HoldEmGame(int, const char* []);
 	virtual int play() override;
