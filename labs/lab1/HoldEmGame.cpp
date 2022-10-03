@@ -49,6 +49,7 @@ void HoldEmGame::collectAll()
     {
         deck.collect(hands[i]);
     }
+    deck.collect(board);
 }
 
 void HoldEmGame::print(std::ostream& os, const std::size_t rc)
@@ -60,7 +61,6 @@ void HoldEmGame::print(std::ostream& os, const std::size_t rc)
         os << "player name: " << players[i] << std::endl;
         hands[i].print(os, rc);
     }
-    deck.collect(board);
 }
 
 int HoldEmGame::play() {
