@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab1/PinochleGame.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-25 14:31:15
- * @LastEditTime: 2022-09-25 16:10:55
+ * @LastEditTime: 2022-10-02 20:41:21
  * @Description: Declaration of pinochle game class derived from base game class.
  *
  */

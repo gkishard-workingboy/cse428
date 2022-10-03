@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab1/PinochleGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-25 14:31:48
- * @LastEditTime: 2022-09-25 16:11:35
+ * @LastEditTime: 2022-10-02 20:44:19
  * @Description: Definition to PinochleGame.h
  *
  */
@@ -43,7 +43,7 @@ void PinochleGame::deal()
 int PinochleGame::play()
 {
     const int CardsInRow = 8;
-    const int STOP = 1;
+    const int STOP = 0;
 
     while (true)
     {

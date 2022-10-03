@@ -85,7 +85,8 @@ player name: player3  5S AS
 BOARD (flop): AH 4D QD 
 BOARD (turn): AH 4D QD QH 
 BOARD (river): AH 4D QD QH 3S 
-Would you like to end the current game?
+
+>>> Would you like to end the current game? (yes/*) 
 
 As expected, each player is dealt 2 cards. Each player is displayed in the same order as in the input. The board has 3 cards in the flop state. A 4th card is added to the board in the turn state, and a 5th card is added in the river state. Typing any string other than "yes" (here, I typed "no") generates a different distribution of the cards. In this case, I got this new distribution:
 
@@ -95,7 +96,8 @@ player name: player3  4D 3S
 BOARD (flop): 5D 2D 7C 
 BOARD (turn): 5D 2D 7C 8H 
 BOARD (river): 5D 2D 7C 8H 4C 
-Would you like to end the current game?
+
+>>> Would you like to end the current game? (yes/*) 
 
 Like in Pinochle, typing "yes" ends the game.
 
