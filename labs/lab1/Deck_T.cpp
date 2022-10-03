@@ -6,15 +6,14 @@
  * @Description: Defition of Deck_T.h
  *
  */
-// initialize mt engine by random value get from random_device
-template <typename R, typename S>
-Deck<R, S>::Deck() : rd(), mtEngine(rd()){};
 
 template <typename R, typename S>
 void Deck<R, S>::shuffle()
 {
     // uniformly reorder the cards
-    std::shuffle(CardSet<R, S>::cards.begin(), CardSet<R, S>::cards.end(), Deck<R, S>::mtEngine);
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(CardSet<R, S>::cards.begin(), CardSet<R, S>::cards.end(), g);
 }
 
 template <typename R, typename S>

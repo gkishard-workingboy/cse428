@@ -18,17 +18,10 @@ template <typename R, typename S>
 class Deck : public CardSet<R, S>
 {
 public:
-    Deck();
     // shuffle cards
     void shuffle();
     // collect
     void collect(CardSet<R, S> &);
-
-private:
-    // non-deterministic
-    std::random_device rd;
-    // PRNG
-    std::mt19937 mtEngine;
 };
 
 #ifdef TEMPLATE_HEADERS_INCLUDE_SOURCE
