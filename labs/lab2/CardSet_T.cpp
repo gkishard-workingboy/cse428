@@ -6,8 +6,10 @@
  * @Description: Source file contains the definition belongs to CardSet_T.h
  *
  */
+#include <iterator>
+
 template <typename R, typename S>
-void CardSet<R, S>::print(std::ostream &os, std::size_t col)
+void CardSet<R, S>::print(std::ostream& os, std::size_t col)
 {
     // counter for cards in current row
     std::size_t cnt = 0;
@@ -31,7 +33,7 @@ void CardSet<R, S>::print(std::ostream &os, std::size_t col)
 }
 
 template <typename R, typename S>
-CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
+CardSet<R, S>& CardSet<R, S>::operator>>(CardSet<R, S>& rhs)
 {
     // throw exception if cards is empty
     if (CardSet<R, S>::cards.empty())
@@ -40,8 +42,8 @@ CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
         throw std::runtime_error("Error: the left-hand side CardSet does not have any cards left.");
     }
     // get the reference to the last card of current cards
-    auto &card = CardSet<R, S>::cards.back();
-    
+    auto& card = CardSet<R, S>::cards.back();
+
     try {
         // push onto the back of rhs's cards.
         rhs.cards.push_back(card);
@@ -62,4 +64,15 @@ template <typename R, typename S>
 bool CardSet<R, S>::isEmpty()
 {
     return CardSet<R, S>::cards.empty();
+}
+
+template <typename R, typename S>
+CardSet<R, S>::CardSet(const CardSet<R, S>& newCardSet) {
+    for (size_t i = 0; i < newCardSet.cards.size(); i++)
+        this->cards.push_back(newCardSet.cards[i]);
+}
+
+template <typename R, typename S>
+const std::vector<Card<R, S>> CardSet<R, S>::* CardSet<R, S>::data() {
+    return &CardSet<R, S>::cards;
 }
