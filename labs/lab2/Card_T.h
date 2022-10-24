@@ -10,7 +10,8 @@
 #include <ostream>
 
 template <typename R, typename S>
-struct Card
+	+
+	struct Card
 {
 public:
 	R rank;
@@ -19,13 +20,13 @@ public:
 };
 
 template <typename R, typename S>
-std::ostream& operator<<(std::ostream&, const Card<R, S>&);
+std::ostream &operator<<(std::ostream &, const Card<R, S> &);
 
 template <typename R, typename S>
-bool cardRankIsSmaller(const Card<R, S>&, const Card<R, S>&);
+bool cardRankIsSmaller(const Card<R, S> &, const Card<R, S> &);
 
 template <typename R, typename S>
-bool cardSuitIsSmaller(const Card<R, S>&, const Card<R, S>&);
+bool cardSuitIsSmaller(const Card<R, S> &, const Card<R, S> &);
 
 #ifdef TEMPLATE_HEADERS_INCLUDE_SOURCE /* test whether guard symbol is defined */
 #include "Card_T.cpp"

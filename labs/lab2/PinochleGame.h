@@ -1,8 +1,8 @@
 /*
- * @FilePath: /428cpp/labs/lab1/PinochleGame.h
+ * @FilePath: /428cpp/labs/lab2/PinochleGame.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-25 14:31:15
- * @LastEditTime: 2022-10-02 20:41:21
+ * @LastEditTime: 2022-10-24 16:49:45
  * @Description: Declaration of pinochle game class derived from base game class.
  *
  */
@@ -40,15 +40,12 @@ enum class PinochleMelds
     insuitdoublerun
 };
 
-std::ostream& operator<<(std::ostream&, const PinochleMelds&);
+std::ostream &operator<<(std::ostream &, const PinochleMelds &);
 
 class PinochleGame : public Game
 {
-public:
-    PinochleGame(int, const char* []);
-    // virtual function: how to play Pinochle Game
-    virtual int play() override;
-    static unsigned int PinochleMeldsPointValue[];
+private:
+    void suit_independent_evaluation(const CardSet<PinochleRank, Suit> &, std::vector<PinochleMelds> &);
 
 protected:
     PinochleDeck deck;
@@ -59,14 +56,17 @@ protected:
     // * DESIGN:
     // * modularize play() by extract parts to 3 member methods
     // print all players' name and hand
-    void print(std::ostream&, const std::size_t);
+    void print(std::ostream &, const std::size_t);
     // collect cards back from players
     void collectAll();
     // ask for whether need to stop the game
-    bool askForStop(std::ostream&, std::istream&);
+    bool askForStop(std::ostream &, std::istream &);
 
-private:
-    void suit_independent_evaluation(const CardSet<PinochleRank, Suit>&, std::vector<PinochleMelds>&);
+public:
+    PinochleGame(int, const char *[]);
+    // virtual function: how to play Pinochle Game
+    virtual int play() override;
+    static unsigned int PinochleMeldsPointValue[];
 };
 
 #endif

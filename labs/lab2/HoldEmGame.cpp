@@ -1,8 +1,8 @@
 /*
- * @FilePath: /428cpp/labs/lab1/HoldEmGame.cpp
+ * @FilePath: /428cpp/labs/lab2/HoldEmGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-10-02 21:33:21
+ * @LastEditTime: 2022-10-24 16:48:08
  * @Description: Definition to HoldEmGame.h
  *
  */
@@ -131,4 +131,43 @@ int HoldEmGame::play()
             return STOP;
         }
     }
+}
+
+operator<<(std::ostream &os, const HoldEmHandRank &herank)
+{
+    string label;
+    stri switch (herank)
+    {
+    case HoldEmHandRank::xhigh:
+        label = "xhigh";
+        break;
+    case HoldEmHandRank::pair:
+        label = "pair";
+        break;
+    case HoldEmHandRank::twopair:
+        label = "twopair";
+        break;
+    case HoldEmHandRank::threeofakind:
+        label = "threeofakind";
+        break;
+    case HoldEmHandRank::straight:
+        label = "straight";
+        break;
+    case HoldEmHandRank::flush:
+        label = "flush";
+        break;
+    case HoldEmHandRank::fullhouse:
+        label = "fullhouse";
+        break;
+    case HoldEmHandRank::fourofakind:
+        label = "fourofakind";
+        break;
+    case HoldEmHandRank::straightflush:
+        label = "straightflush";
+        break;
+    default:
+        label = "undefined";
+        break;
+    }
+    return os << label;
 }
