@@ -10,8 +10,7 @@
 #include <ostream>
 
 template <typename R, typename S>
-	+
-	struct Card
+struct Card
 {
 public:
 	R rank;

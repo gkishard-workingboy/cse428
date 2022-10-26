@@ -9,8 +9,7 @@
 #include <iterator>
 
 template <typename R, typename S>
-void CardSet<R, S>::print(std::ostream &os, std::size_t col)
-{
+void CardSet<R, S>::print(std::ostream& os, std::size_t col) {
     // counter for cards in current row
     std::size_t cnt = 0;
     // using itrator to traverse all cards
@@ -33,8 +32,7 @@ void CardSet<R, S>::print(std::ostream &os, std::size_t col)
 }
 
 template <typename R, typename S>
-CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
-{
+CardSet<R, S>& CardSet<R, S>::operator>>(CardSet<R, S>& rhs) {
     // throw exception if cards is empty
     if (CardSet<R, S>::cards.empty())
     {
@@ -42,7 +40,7 @@ CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
         throw std::runtime_error("Error: the left-hand side CardSet does not have any cards left.");
     }
     // get the reference to the last card of current cards
-    auto &card = CardSet<R, S>::cards.back();
+    auto& card = CardSet<R, S>::cards.back();
 
     try
     {
@@ -51,11 +49,11 @@ CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
         // pop last card
         CardSet<R, S>::cards.pop_back();
     }
-    catch (const std::bad_alloc &exception)
+    catch (const std::bad_alloc& exception)
     {
         std::cout << "bad allocation failure " << exception.what() << std::endl;
     }
-    catch (const std::exception &exception)
+    catch (const std::exception& exception)
     {
         std::cout << "failed " << exception.what() << std::endl;
     }
@@ -64,20 +62,17 @@ CardSet<R, S> &CardSet<R, S>::operator>>(CardSet<R, S> &rhs)
 }
 
 template <typename R, typename S>
-bool CardSet<R, S>::isEmpty()
-{
+bool CardSet<R, S>::isEmpty() const {
     return CardSet<R, S>::cards.empty();
 }
 
 template <typename R, typename S>
-CardSet<R, S>::CardSet(const CardSet<R, S> &newCardSet)
-{
+CardSet<R, S>::CardSet(const CardSet<R, S>& newCardSet) {
     for (size_t i = 0; i < newCardSet.cards.size(); i++)
         this->cards.push_back(newCardSet.cards[i]);
 }
 
 template <typename R, typename S>
-const std::vector<Card<R, S>> CardSet<R, S>::*CardSet<R, S>::data()
-{
+std::vector<Card<R, S>> CardSet<R, S>::* CardSet<R, S>::data() {
     return &CardSet<R, S>::cards;
 }

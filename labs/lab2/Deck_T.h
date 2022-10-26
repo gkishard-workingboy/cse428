@@ -1,8 +1,8 @@
 /*
- * @FilePath: /428cpp/labs/lab1/Deck_T.h
+ * @FilePath: /428cpp/labs/lab2/Deck_T.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-24 21:48:13
- * @LastEditTime: 2022-09-25 14:10:50
+ * @LastEditTime: 2022-10-24 23:09:37
  * @Description: Declaration of class Deck derived public from CardSet with same template parameterized.
  *
  */
