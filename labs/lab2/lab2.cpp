@@ -52,7 +52,7 @@ shared_ptr<Game> create(int argc, const char *argv[])
 
 int usage(ResultCode rc)
 {
-    cout << "Usage: ./lab1.out <Game> <Player Names>" << endl;
+    cout << "Usage: ./lab2.out <Game> <Player Names>" << endl;
     cout << "Game should be either 'Pinochle' or 'HoldEm'." << endl;
     if (rc != ResultCode::UsageHoldEmPlayerNumError)
     {
