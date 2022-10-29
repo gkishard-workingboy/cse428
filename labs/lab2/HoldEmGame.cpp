@@ -371,7 +371,9 @@ HoldEmHandRank HoldEmGame::holdem_hand_evaluation(const CardSet<HoldEmRank, Suit
                 case 2:
                     if (hrmask & (1 << static_cast<int>(HoldEmHandRank::pair)))
                     {
-                        hrmask |= (1 << static_cast<int>(HoldEmHandRank::twopair));
+                        if(i != static_cast<int>(HoldEmRank::Ace) + 1){
+                            hrmask |= (1 << static_cast<int>(HoldEmHandRank::twopair));
+                        }
                     }
                     hrmask |= (1 << static_cast<int>(HoldEmHandRank::pair));
                     if (hrmask & (1 << static_cast<int>(HoldEmHandRank::threeofakind)))
