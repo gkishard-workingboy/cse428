@@ -12,7 +12,7 @@ Game::Game(int argc, const char *argv[])
 {
     // * DESIGN CHOICE
     // * the index start from 2
-    for (int i = 2; i < argc; ++i)
+    for (int i = Game::firstPlayerIndex; i < argc; ++i)
     {
         // use c-style string directly construct c++ string object
         players.emplace_back(argv[i]);
