@@ -45,7 +45,74 @@ If the game is HoldEm, there must be between 2 and 9 player names.
 
 For well-formed commands, the program plays the game as expected.
 
-For example, "./lab2.out HoldEm p1 p2 p3" yields the following output:
+For example, "./lab2.out Pinochle p1 p2 p3 p4" yields the following output:
+
+player name: p1
+QD AD KH AC KC JH AD KH 
+9H QS JD KD 
+Melds:  pinochle 40
+player name: p2
+JC KS 10H AH 10S 10S QH 10D 
+QS JD 9C JC 
+Melds:  pinochle 40
+player name: p3
+9D JS JH QD 9S 10H 9S 10C 
+9H JS KD QC 
+Melds:
+player name: p4
+10C 10D AS 9D QH AH AS AC 
+QC 9C KC KS 
+Melds:
+
+>>> Do you wish to stop playing? (yes/*)
+
+Typing "yes" here will end the game, but typing anything else will generate a new distribution of cards. We re-generated the cards several times. Each time the cards were generated, the players' hands are listed in the order that the user specified in the command. Each player's melds are identified if there are any. In the output above, p1 and p2 were correctly identified to have pinochle since they each have one pair of JD and QS cards.
+
+Here are some additional examples of outputs we got when playing:
+
+In the output below, p1 is found to have hundredaces since they have at least one ace from every suit, but do not have all 8 aces. p2 has eightykings since they have one king from every suit. p3 is shown to have both fortyjacks and pinochle. This makes since since p3 has one jack from every suit and a JD and QS. 
+
+player name: p1
+KD 10D AC AD AD 9H AH QC 
+QS AS AC 10H 
+Melds:  hundredaces 100
+player name: p2
+KC AH 10S 10C JD 10H JS KD 
+9D KH JC KS 
+Melds:  eightykings 80
+player name: p3
+QD JD KH JS JC 10C QH QS 
+KS JH 10S 9S 
+Melds:  fortyjacks 40  pinochle 40
+player name: p4
+JH AS 10D 9H QD 9C QC QH 
+9D 9C 9S KC 
+Melds:
+
+>>> Do you wish to stop playing? (yes/*)
+
+Another output is shown below. Here, p1 is shown as having doublepinochle since they have two pairs of JD and QS. Note that p1 has the combination of cards needed for pinochle. However, p1 also meets the criteria for doublepinochle, so only the doublepinochle is counted.
+
+player name: p1
+JD JD 9C QC AH QS JH QS 
+KS 9S 9H JS 
+Melds:  doublepinochle 300
+player name: p2
+10C AD KS AH JC AC KC AC 
+9S 9D 10H 10S 
+Melds:
+player name: p3
+10S 10C KH KC KD 9D 10D AS 
+QD 10H 9H 10D 
+Melds:
+player name: p4
+KH QH KD QC AS 9C QH JH 
+JC QD JS AD 
+Melds:
+
+>>> Do you wish to stop playing? (yes/*) 
+
+The HoldEm game also works as expected. The command "./lab2.out HoldEm p1 p2 p3" yields the following output:
 
 player name: p1
 AH 2S 
@@ -68,7 +135,7 @@ BOARD (river): 6S 8S 7D 3H 6D
 
 >>> Would you like to end the current game? (yes/*)
 
-Typing "yes" here will end the game, but typing anything else will generate a new distribution of cards. We re-generated the cards several times. Each time the cards were generated, the players' hands are initially listed in the order that the user specified in the command. Each player is dealt 2 cards. Then, the program prints the board, which has 3 cards. The cards on the board are dealt to each player. The players' hands are displayed again after the flop. For each hand, the program lists the cards in order, starting with the player's original 2 cards followed by the 3 cards dealt from the board. This time, the players are listed in descending order based on rank.
+Like in Pinochle, typing "yes" here will end the game, but typing anything else will generate a new distribution of cards. We re-generated the cards several times. Each time the cards were generated, the players' hands are initially listed in the order that the user specified in the command. Each player is dealt 2 cards. Then, the program prints the board, which has 3 cards. The cards on the board are dealt to each player. The players' hands are displayed again after the flop. For each hand, the program lists the cards in order, starting with the player's original 2 cards followed by the 3 cards dealt from the board. This time, the players are listed in descending order based on rank.
 
 Here a few examples from the outputs we got:
 
