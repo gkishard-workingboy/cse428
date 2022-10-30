@@ -37,11 +37,14 @@ For any misformed command line, the program prints a usage message and terminate
 ./lab2.out HoldEm playerA
 ./lab2.out HoldEm player1 player2 player3 player4 player5 player6 player7 player8 player9 player10
 
-All of the above commands caused the program to return a non-zero value and print this message:
+All of the above commands caused the program to return a non-zero value.
+If the game name is missing or isn't Pinochle or HoldEm, the following message appears:
 Usage: ./lab2.out <Game> <Player Names>
 Game can be 'Pinochle' or 'HoldEm'.
 If the game is Pinochle, there must be 4 player names.
 If the game is HoldEm, there must be between 2 and 9 player names.
+
+If the game was specified as Pinochle but there is an incorrect number of player names, the same message above is displayed without the fourth line. If the game was HoldEm and there are too many or too few player names, this message is displayed without the third line.
 
 For well-formed commands, the program plays the game as expected.
 
