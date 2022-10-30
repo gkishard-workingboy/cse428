@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab2/PinochleGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-25 14:31:48
- * @LastEditTime: 2022-10-25 19:20:08
+ * @LastEditTime: 2022-10-29 23:25:15
  * @Description: Definition to PinochleGame.h
  *
  */
@@ -19,10 +19,9 @@ const int SUIT_MASK = (1 << static_cast<int>(Suit::undefined)) - 1;
 
 unsigned int PinochleGame::PinochleMeldsPointValue[PINOCHLE_NUM_ITEMS] = { 10, 20, 40, 40, 40, 60, 80, 100, 150, 300, 400, 600, 800, 1000, 1500 };
 
-PinochleGame::PinochleGame(int argc, const char* argv[]) : Game(argc, argv) {
+PinochleGame::PinochleGame(int argc, const char* argv[]): Game(argc, argv) {
     // create as many hands as players in the game
-    for (int i = 2; i < argc; ++i)
-    {
+    for (int i = 2; i < argc; ++i) {
         // will call default constructor of CardSet
         hands.emplace_back();
     }
@@ -34,13 +33,11 @@ void PinochleGame::deal() {
     // number of players in game
     int numHands = hands.size();
     // repeatedly shift a packet of cards to each hand of players
-    for (int p = 0; !deck.isEmpty(); p = (p + 1) % numHands)
-    {
+    for (int p = 0; !deck.isEmpty(); p = (p + 1) % numHands) {
         // current hand
         auto& hand = hands[p];
         // shift a packet of cards
-        for (int i = 0; i < packet && !deck.isEmpty(); ++i)
-        {
+        for (int i = 0; i < packet && !deck.isEmpty(); ++i) {
             deck >> hand;
         }
     }
@@ -50,8 +47,7 @@ int PinochleGame::play() {
     const int CardsInRow = 8;
     const int STOP = 0;
 
-    while (true)
-    {
+    while (true) {
         // call the deck's shuffle member function
         deck.shuffle();
         // call the deal member function to distribute the cards to the players
@@ -59,21 +55,10 @@ int PinochleGame::play() {
         // print out each player's name and then the cards in their hand to the standard output stream
         print(std::cout, CardsInRow);
 
-        // for each hand initiate a vector and call suit_independent_evaluation to print scores
-        int numPlayer = players.size();
-        for (int i = 0; i < numPlayer; ++i)
-        {
-            std::vector<PinochleMelds> melds;
-            suit_independent_evaluation(hands[i], melds);
-            for (auto meld : melds)
-                std::cout << meld << std::endl;
-        }
-
         // use the deck's collect member function repeatedly to move the cards back out of each player's hand into the deck
         collectAll();
         // print a string to the standard output stream that asks the user whether or not to end the game
-        if (askForStop(std::cout, std::cin))
-        {
+        if (askForStop(std::cout, std::cin)) {
             // if that string is "yes" the member function should return a value to indicate success, and otherwise it should repeat the sequence of steps
             return STOP;
         }
@@ -83,18 +68,23 @@ int PinochleGame::play() {
 void PinochleGame::print(std::ostream& os, const std::size_t rc) {
     int numPlayer = players.size();
     // print each player's status
-    for (int i = 0; i < numPlayer; ++i)
-    {
+    for (int i = 0; i < numPlayer; ++i) {
         os << "player name: " << players[i] << std::endl;
         hands[i].print(os, rc);
+        // for each hand initiate a vector and call suit_independent_evaluation to print scores
+        std::vector<PinochleMelds> melds;
+        suit_independent_evaluation(hands[i], melds);
+        std::cout << "Melds:";
+        for (auto meld : melds)
+            std::cout << "  " << meld;
+        std::cout << std::endl;
     }
 }
 
 void PinochleGame::collectAll() {
     int numPlayer = players.size();
     // collect cards from each player hand
-    for (int i = 0; i < numPlayer; ++i)
-    {
+    for (int i = 0; i < numPlayer; ++i) {
         deck.collect(hands[i]);
     }
 }
@@ -112,8 +102,7 @@ bool PinochleGame::askForStop(std::ostream& os, std::istream& is) {
 
 std::ostream& operator<<(std::ostream& os, const PinochleMelds& pm) {
     std::string meldName;
-    switch (pm)
-    {
+    switch (pm) {
         case PinochleMelds::dix:
             meldName = "dix";
             break;
@@ -186,98 +175,69 @@ void PinochleGame::suit_independent_evaluation(const CardSet<PinochleRank, Suit>
     int mask = 0;
 
     // while loop to check scores for each cases
-    while (i < s.size())
-    {
+    while (i < s.size()) {
         mask = 0;
         count = 0;
-        if (s.at(i).rank == PinochleRank::Ace)
-        {
-            for (j = i; j < s.size() && s.at(j).rank == PinochleRank::Ace; ++j)
-            {
+        if (s.at(i).rank == PinochleRank::Ace) {
+            for (j = i; j < s.size() && s.at(j).rank == PinochleRank::Ace; ++j) {
                 count++;
                 mask |= 1 << static_cast<int>(s[j].suit);
             }
-            if (count >= EIGHT_SAME_RANKS)
-            {
+            if (count >= EIGHT_SAME_RANKS) {
                 pmv.push_back(PinochleMelds::thousandaces);
-            }
-            else if (count >= FOUR_SAME_RANKS && mask == SUIT_MASK)
-            {
+            } else if (count >= FOUR_SAME_RANKS && mask == SUIT_MASK) {
                 pmv.push_back(PinochleMelds::hundredaces);
             }
         }
 
-        else if (s.at(i).rank == PinochleRank::King)
-        {
-            for (j = i; j < s.size() && s.at(j).rank == PinochleRank::King; ++j)
-            {
+        else if (s.at(i).rank == PinochleRank::King) {
+            for (j = i; j < s.size() && s.at(j).rank == PinochleRank::King; ++j) {
                 count++;
                 mask |= 1 << static_cast<int>(s[j].suit);
             }
-            if (count >= EIGHT_SAME_RANKS)
-            {
+            if (count >= EIGHT_SAME_RANKS) {
                 pmv.push_back(PinochleMelds::eighthundredkings);
-            }
-            else if (count >= FOUR_SAME_RANKS && mask == SUIT_MASK)
-            {
+            } else if (count >= FOUR_SAME_RANKS && mask == SUIT_MASK) {
                 pmv.push_back(PinochleMelds::eightykings);
             }
-        }
-        else if (s.at(i).rank == PinochleRank::Queen)
-        {
-            for (j = i; j < s.size() && s.at(j).rank == PinochleRank::Queen; ++j)
-            {
+        } else if (s.at(i).rank == PinochleRank::Queen) {
+            for (j = i; j < s.size() && s.at(j).rank == PinochleRank::Queen; ++j) {
                 count++;
                 mask |= 1 << static_cast<int>(s[j].suit);
-                if (s.at(j).suit == Suit::Spades)
-                {
+                if (s.at(j).suit == Suit::Spades) {
                     spd++;
                 }
             }
-            if (count >= EIGHT_SAME_RANKS)
-            {
+            if (count >= EIGHT_SAME_RANKS) {
                 pmv.push_back(PinochleMelds::sixhundredqueens);
-            }
-            else if (count >= FOUR_SAME_RANKS && mask == SUIT_MASK)
-            {
+            } else if (count >= FOUR_SAME_RANKS && mask == SUIT_MASK) {
                 pmv.push_back(PinochleMelds::sixtyqueens);
             }
-        }
-        else if (s.at(i).rank == PinochleRank::Jack)
-        {
-            for (j = i; j < s.size() && s.at(j).rank == PinochleRank::Jack; ++j)
-            {
+        } else if (s.at(i).rank == PinochleRank::Jack) {
+            for (j = i; j < s.size() && s.at(j).rank == PinochleRank::Jack; ++j) {
                 count++;
                 mask |= 1 << static_cast<int>(s[j].suit);
-                if (s.at(j).suit == Suit::Diamonds)
-                {
+                if (s.at(j).suit == Suit::Diamonds) {
                     dmd++;
                 }
             }
-            if (count >= EIGHT_SAME_RANKS)
-            {
+            if (count >= EIGHT_SAME_RANKS) {
                 pmv.push_back(PinochleMelds::fourhundredjacks);
-            }
-            else if (count >= FOUR_SAME_RANKS && mask == SUIT_MASK)
-            {
+            } else if (count >= FOUR_SAME_RANKS && mask == SUIT_MASK) {
                 pmv.push_back(PinochleMelds::fortyjacks);
             }
         }
         // skip other kinds of rank.
-        else
-        {
+        else {
             for (j = i + 1; j < s.size() && s.at(j).rank == s[i].rank; ++j)
                 ;
         }
         i = j;
     }
 
-    if (dmd >= DOUBLE_PINOCHLE_CASE && spd >= DOUBLE_PINOCHLE_CASE)
-    {
+    if (dmd >= DOUBLE_PINOCHLE_CASE && spd >= DOUBLE_PINOCHLE_CASE) {
         pmv.push_back(PinochleMelds::doublepinochle);
-    }
-    else if (dmd >= PINOCHLE_CASE && spd >= PINOCHLE_CASE)
-    {
+    } else if (dmd >= PINOCHLE_CASE && spd >= PINOCHLE_CASE) {
         pmv.push_back(PinochleMelds::pinochle);
     }
 }
