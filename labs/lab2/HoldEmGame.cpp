@@ -15,7 +15,7 @@ const int STD_HAND_NUM = 5;
 
 HoldEmGame::HoldEmGame(int argc, const char* argv[]): Game(argc, argv), state(HoldEmState::preflop) {
     // create as many hands as players in the game
-    for (int i = 2; i < argc; ++i) {
+    for (int i = Game::firstPlayerIndex; i < argc; ++i) {
         // will call default constructor of CardSet
         hands.emplace_back();
     }
