@@ -17,6 +17,7 @@
 class Game
 {
 public:
+    static const int firstPlayerIndex = 2;
     Game(int, const char *[]);
     // pure virtual function play
     virtual int play() = 0;
