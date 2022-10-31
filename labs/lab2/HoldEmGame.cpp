@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab2/HoldEmGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-10-30 00:05:31
+ * @LastEditTime: 2022-10-31 18:34:47
  * @Description: Definition to HoldEmGame.h
  *
  */
@@ -10,8 +10,13 @@
 using namespace std;
 
 const int handCards = 2;
+const int LENGTH_OF_PAIR = 2;
+const int LENGTH_OF_THREE = 3;
+const int LENGTH_OF_FOUR = 4;
 // standard number of cards in hand for evaluation
 const int STD_HAND_NUM = 5;
+const int ACE_OFFSET = 1;
+const int ACE_LOW = 0;
 
 HoldEmGame::HoldEmGame(int argc, const char* argv[]): Game(argc, argv), state(HoldEmState::preflop) {
     // create as many hands as players in the game
@@ -206,7 +211,9 @@ bool operator<(const HoldEmGame::PlayerHand& lhs, const HoldEmGame::PlayerHand& 
             case HoldEmHandRank::pair:
             case HoldEmHandRank::twopair:
                 {
+                    // index of last element 
                     int lix = lcs.size() - 1, rix = rcs.size() - 1;
+                    // reversely traversal, to find largest rank
                     for (; lix > 0;) {
                         lpair = lcs[lix--].rank;
                         if (lcs[lix].rank == lpair) { break; }
@@ -216,8 +223,8 @@ bool operator<(const HoldEmGame::PlayerHand& lhs, const HoldEmGame::PlayerHand& 
                         if (rcs[rix].rank == rpair) { break; }
                     }
                     if (lpair == rpair) {
-                        lcs.erase(lcs.begin() + lix, lcs.begin() + lix + 2);
-                        rcs.erase(rcs.begin() + rix, rcs.begin() + rix + 2);
+                        lcs.erase(lcs.begin() + lix, lcs.begin() + lix + LENGTH_OF_PAIR);
+                        rcs.erase(rcs.begin() + rix, rcs.begin() + rix + LENGTH_OF_PAIR);
                         HoldEmHandRank nxtrank = lhs.rank == HoldEmHandRank::twopair ? HoldEmHandRank::pair : HoldEmHandRank::xhigh;
                         HoldEmGame::PlayerHand lsub(lcopy, lhs.name, nxtrank), rsub(rcopy, rhs.name, nxtrank);
                         return lsub < rsub;
@@ -232,7 +239,7 @@ bool operator<(const HoldEmGame::PlayerHand& lhs, const HoldEmGame::PlayerHand& 
                         lpair = sit->rank;
                         pit = sit;
                     } else {
-                        if (pit - sit > 2) {
+                        if (pit - sit > LENGTH_OF_PAIR) {
                             break;
                         }
                     }
@@ -242,7 +249,7 @@ bool operator<(const HoldEmGame::PlayerHand& lhs, const HoldEmGame::PlayerHand& 
                         rpair = sit->rank;
                         pit = sit;
                     } else {
-                        if (pit - sit > 2) {
+                        if (pit - sit > LENGTH_OF_PAIR) {
                             break;
                         }
                     }
@@ -292,13 +299,13 @@ HoldEmHandRank HoldEmGame::holdem_hand_evaluation(const CardSet<HoldEmRank, Suit
     // current hand's rank, at least xhigh
     HoldEmHandRank hrk = HoldEmHandRank::xhigh;
     vector<int> suitcounts(static_cast<int>(Suit::undefined), 0);
-    vector<int> rankcounts(static_cast<int>(HoldEmRank::undefined) + 1, 0);
+    vector<int> rankcounts(static_cast<int>(HoldEmRank::undefined) + ACE_OFFSET, 0);
     for (Card<HoldEmRank, Suit>& card : cards) {
         suitcounts[static_cast<int>(card.suit)]++;
-        rankcounts[static_cast<int>(card.rank) + 1]++;
+        rankcounts[static_cast<int>(card.rank) + ACE_OFFSET]++;
         if (card.rank == HoldEmRank::Ace)
             // index 0 stands for ace values as 1
-            rankcounts[0]++;
+            rankcounts[ACE_LOW]++;
     }
     for (i = 0; i < suitcounts.size(); ++i) {
         if (suitcounts[i] == STD_HAND_NUM) {
@@ -306,7 +313,7 @@ HoldEmHandRank HoldEmGame::holdem_hand_evaluation(const CardSet<HoldEmRank, Suit
         }
     }
     // skip index 0
-    for (i = static_cast<int>(HoldEmRank::Two) + 1, cnt = 0; i < rankcounts.size(); ++i) {
+    for (i = ACE_OFFSET, cnt = 0; i < rankcounts.size(); ++i) {
         if (rankcounts[i]) {
             cnt++;
             if (cnt == STD_HAND_NUM) {
@@ -317,16 +324,16 @@ HoldEmHandRank HoldEmGame::holdem_hand_evaluation(const CardSet<HoldEmRank, Suit
             }
             int num = rankcounts[i];
             switch (num) {
-                case 4:
+                case LENGTH_OF_FOUR:
                     hrmask |= (1 << static_cast<int>(HoldEmHandRank::fourofakind));
                     break;
-                case 3:
+                case LENGTH_OF_THREE:
                     hrmask |= (1 << static_cast<int>(HoldEmHandRank::threeofakind));
                     if (hrmask & (1 << static_cast<int>(HoldEmHandRank::pair))) {
                         hrmask |= (1 << static_cast<int>(HoldEmHandRank::fullhouse));
                     }
                     break;
-                case 2:
+                case LENGTH_OF_PAIR:
                     if (hrmask & (1 << static_cast<int>(HoldEmHandRank::pair))) {
 
                         hrmask |= (1 << static_cast<int>(HoldEmHandRank::twopair));
