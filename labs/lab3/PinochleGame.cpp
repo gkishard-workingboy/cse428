@@ -19,7 +19,7 @@ const int SUIT_MASK = (1 << static_cast<int>(Suit::undefined)) - 1;
 
 unsigned int PinochleGame::PinochleMeldsPointValue[PINOCHLE_NUM_ITEMS] = { 10, 20, 40, 40, 40, 60, 80, 100, 150, 300, 400, 600, 800, 1000, 1500 };
 
-PinochleGame::PinochleGame(int argc, const char* argv[]): Game(argc, argv) {
+PinochleGame::PinochleGame(int argc, const char* argv[]): Game(argc, argv), trump_suit(Suit::undefined){
     // create as many hands as players in the game
     for (int i = Game::firstPlayerIndex; i < argc; ++i) {
         // will call default constructor of CardSet
@@ -54,6 +54,10 @@ int PinochleGame::play() {
         deck.shuffle();
         // call the deal member function to distribute the cards to the players
         deal();
+        //make trump_suit the last card dealt
+        const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
+        auto dealer_hand = hands.at(dealer).*pdata;
+        trump_suit = dealer_hand.back().suit;
         // print out each player's name and then the cards in their hand to the standard output stream
         print(std::cout, CardsInRow);
 
