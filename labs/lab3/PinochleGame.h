@@ -46,6 +46,7 @@ class PinochleGame : public Game
 {
 private:
     void suit_independent_evaluation(const CardSet<PinochleRank, Suit> &, std::vector<PinochleMelds> &);
+    void suit_dependent_evaluation(const CardSet<PinochleRank, Suit>&, std::vector<PinochleMelds>&, Suit);
 
 protected:
     PinochleDeck deck;

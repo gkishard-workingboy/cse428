@@ -247,3 +247,79 @@ void PinochleGame::suit_independent_evaluation(const CardSet<PinochleRank, Suit>
         pmv.push_back(PinochleMelds::pinochle);
     }
 }
+
+void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& cs, std::vector<PinochleMelds>& pmv, Suit passed_suit){
+    // call copy constructor and make an independent copy
+    CardSet<PinochleRank, Suit> csl(cs);
+    // data returns a pointer to the content member fo class CardSet
+    const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
+    // to use pdata, bind to an object of CardSet
+    auto s = csl.*pdata;
+    // sort (rank and then suit ordering relation) and reverse the vector
+    std::sort(s.begin(), s.end(), cardSuitIsSmaller<PinochleRank, Suit>);
+    std::reverse(s.begin(), s.end());
+
+    size_t i = 0, j;
+    int run_mask = (1 << static_cast<int>(PinochleRank::Ace)) - 1;
+    int run = 0; // each bit represents one of J,Q,K,10,A. Bit is 1 if there's at least one card of that rank in the passed suit.
+    int double_run = 0; // each bit represents one of J,Q,K,10,A. Bit is 1 if there's 2 cards of that rank in the passed suit.
+
+    int passed_suit_mask = 1 << static_cast<int>(passed_suit);
+    int king_all_suits = 0; // each bit represents a suit, the bit is set to 1 if there's a king of the given suit
+    int queen_all_suits = 0; // each bit represents a suit, the bit is set to 1 if there's a queen of the given suit
+    boolean dix = false;
+
+     while (i < s.size()) {
+        if(s.at(i).suit == passed_suit){
+            for (j = i; j < s.size() && s.at(j).suit == passed_suit; ++j) {
+                if(s.at(j).rank == PinochleRank::Nine){
+                    dix = true;
+                }
+                else {
+                    int rank_mask = 1 << (static_cast<int>(s.at(j).rank) - 1);
+                    if(run & rank_mask > 0){
+                        double_run |= rank_mask;
+                    }
+                    else {
+                        run |= rank_mask;
+                    }
+                    if(s.at(j).rank == PinochleRank::King){
+                        king_all_suits |= passed_suit_mask;
+                    }
+                    else if(s.at(j).rank == PinochleRank::Queen){
+                        queen_all_suits |= passed_suit_mask;
+                    }
+                }
+            }
+        }
+        else{
+            int current_suit_mask = 1 << static_cast<int>(s.at(i).suit);
+            if(s.at(i).rank == PinochleRank::King){
+                king_all_suits |= current_suit_mask;
+            }
+            if(s.at(i).rank == PinochleRank::Queen){
+                queen_all_suits |= current_suit_mask;
+            }
+        }
+        i = j;
+    }
+
+    if(double_run == run_mask){
+        pmv.push_back(PinochleMelds::insuitdoublerun);
+    }
+    else if (run == run_mask){
+        pmv.push_back(PinochleMelds::insuitrun);
+    }
+
+    int marriage = king_all_suits & queen_all_suits;
+    if(marriage == passed_suit_mask){
+        pmv.push_back(PinochleMelds::insuitmarriage);
+    }
+    else if(marriage > 0){
+        pmv.push_back(PinochleMelds::offsuitmarriage);
+    }
+
+    if(dix){
+        pmv.push_back(PinochleMelds::dix);
+    }
+}
