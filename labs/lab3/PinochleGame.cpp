@@ -33,6 +33,7 @@ void PinochleGame::deal() {
     // number of players in game
     int numHands = hands.size();
     // repeatedly shift a packet of cards to each hand of players, starting with the player right after the dealer and ending with the dealer.
+    while(!deck.isEmpty()){
     for (int p = 1; p <= numHands && !deck.isEmpty(); ++p) {
         // current hand
         auto& hand = hands[(dealer + p) % numHands];
@@ -40,6 +41,7 @@ void PinochleGame::deal() {
         for (int i = 0; i < packet && !deck.isEmpty(); ++i) {
             deck >> hand;
         }
+    }
     }
 }
 
@@ -80,6 +82,9 @@ void PinochleGame::print(std::ostream& os, const std::size_t rc) {
         // for each hand initiate a vector and call suit_independent_evaluation to print scores
         std::vector<PinochleMelds> melds;
         suit_independent_evaluation(hands[i], melds);
+        for(Suit suit = Suit::Clubs; suit != Suit::undefined; ++suit){
+            suit_dependent_evaluation(hands[i], melds, suit);
+        }
         std::cout << "Melds:";
         for (auto meld : melds)
             std::cout << "  " << meld;
@@ -267,7 +272,7 @@ void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& 
     int passed_suit_mask = 1 << static_cast<int>(passed_suit);
     int king_all_suits = 0; // each bit represents a suit, the bit is set to 1 if there's a king of the given suit
     int queen_all_suits = 0; // each bit represents a suit, the bit is set to 1 if there's a queen of the given suit
-    boolean dix = false;
+    bool dix = false;
 
      while (i < s.size()) {
         if(s.at(i).suit == passed_suit){
@@ -277,7 +282,7 @@ void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& 
                 }
                 else {
                     int rank_mask = 1 << (static_cast<int>(s.at(j).rank) - 1);
-                    if(run & rank_mask > 0){
+                    if((run & rank_mask) > 0){
                         double_run |= rank_mask;
                     }
                     else {
@@ -291,6 +296,8 @@ void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& 
                     }
                 }
             }
+
+            i = j;
         }
         else{
             int current_suit_mask = 1 << static_cast<int>(s.at(i).suit);
@@ -300,8 +307,8 @@ void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& 
             if(s.at(i).rank == PinochleRank::Queen){
                 queen_all_suits |= current_suit_mask;
             }
+            ++i;
         }
-        i = j;
     }
 
     if(double_run == run_mask){
@@ -312,7 +319,7 @@ void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& 
     }
 
     int marriage = king_all_suits & queen_all_suits;
-    if(marriage == passed_suit_mask){
+    if((marriage & passed_suit_mask) == passed_suit_mask){
         pmv.push_back(PinochleMelds::insuitmarriage);
     }
     else if(marriage > 0){
