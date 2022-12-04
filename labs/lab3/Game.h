@@ -24,6 +24,8 @@ public:
 
 protected:
     std::vector<std::string> players;
+    size_t dealer;
+    std::vector<unsigned int> scores;
 };
 
 #endif

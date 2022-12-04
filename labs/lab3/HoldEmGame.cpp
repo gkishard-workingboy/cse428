@@ -31,9 +31,10 @@ void HoldEmGame::deal() {
 
     if (this->state == HoldEmState::preflop) {
         for (size_t i = 0; i < handCards; i++) {
-            for (size_t j = 0; j < hands.size() && !deck.isEmpty(); j++) {
-                deck >> hands[j];
+            for (size_t j = 1; j < hands.size() && !deck.isEmpty(); j++) {
+                deck >> hands[(dealer + j) % hands.size()];
             }
+            deck >> hands[dealer];
         }
         this->state = HoldEmState::flop;
     } else if (this->state == HoldEmState::flop) {
@@ -65,7 +66,11 @@ void HoldEmGame::print(std::ostream& os, const std::size_t rc) {
     int numPlayer = players.size();
     // print each player's status
     for (int i = 0; i < numPlayer; ++i) {
-        os << "player name: " << players[i] << std::endl;
+        os << "player name: " << players[i];
+        if(i == dealer){
+            os << "*";
+        }
+        os << std::endl;
         hands[i].print(os, rc);
     }
 }
@@ -173,6 +178,8 @@ int HoldEmGame::play() {
         if (askForStop(cout, cin)) {
             return STOP;
         }
+
+        dealer = (++dealer) % players.size();
     }
 }
 
