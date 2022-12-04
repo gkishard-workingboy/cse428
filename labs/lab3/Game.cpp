@@ -8,7 +8,7 @@
  */
 #include "Game.h"
 
-Game::Game(int argc, const char *argv[])
+Game::Game(int argc, const char *argv[]) : dealer(0)
 {
     // * DESIGN CHOICE
     // * the index start from 2
@@ -16,5 +16,7 @@ Game::Game(int argc, const char *argv[])
     {
         // use c-style string directly construct c++ string object
         players.emplace_back(argv[i]);
+        scores.emplace_back(0);
     }
+    dealer = players.size() - 1;
 }
