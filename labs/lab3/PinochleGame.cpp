@@ -32,10 +32,10 @@ void PinochleGame::deal() {
     const int packet = 3;
     // number of players in game
     int numHands = hands.size();
-    // repeatedly shift a packet of cards to each hand of players
-    for (int p = 0; !deck.isEmpty(); p = (p + 1) % numHands) {
+    // repeatedly shift a packet of cards to each hand of players, starting with the player right after the dealer and ending with the dealer.
+    for (int p = 1; p <= numHands && !deck.isEmpty(); ++p) {
         // current hand
-        auto& hand = hands[p];
+        auto& hand = hands[(dealer + p) % numHands];
         // shift a packet of cards
         for (int i = 0; i < packet && !deck.isEmpty(); ++i) {
             deck >> hand;
@@ -62,14 +62,20 @@ int PinochleGame::play() {
             // if that string is "yes" the member function should return a value to indicate success, and otherwise it should repeat the sequence of steps
             return STOP;
         }
+
+        dealer = (dealer + 1) % players.size();
     }
 }
 
 void PinochleGame::print(std::ostream& os, const std::size_t rc) {
     int numPlayer = players.size();
     // print each player's status
-    for (int i = 0; i < numPlayer; ++i) {
-        os << "player name: " << players[i] << std::endl;
+    for (size_t i = 0; i < numPlayer; ++i) {
+        os << "player name: " << players[i];
+        if(i == dealer){
+            os << "*";
+        }
+        os << std::endl;
         hands[i].print(os, rc);
         // for each hand initiate a vector and call suit_independent_evaluation to print scores
         std::vector<PinochleMelds> melds;
