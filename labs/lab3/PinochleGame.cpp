@@ -68,7 +68,7 @@ int PinochleGame::play() {
 }
 
 void PinochleGame::print(std::ostream& os, const std::size_t rc) {
-    int numPlayer = players.size();
+    size_t numPlayer = players.size();
     // print each player's status
     for (size_t i = 0; i < numPlayer; ++i) {
         os << "player name: " << players[i];
