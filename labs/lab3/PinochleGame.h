@@ -45,6 +45,7 @@ std::ostream &operator<<(std::ostream &, const PinochleMelds &);
 class PinochleGame : public Game
 {
 private:
+    Suit trump_suit;
     void suit_independent_evaluation(const CardSet<PinochleRank, Suit> &, std::vector<PinochleMelds> &);
     void suit_dependent_evaluation(const CardSet<PinochleRank, Suit>&, std::vector<PinochleMelds>&, Suit);
 
