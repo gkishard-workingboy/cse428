@@ -60,6 +60,7 @@ private:
     void suit_dependent_evaluation(const CardSet<PinochleRank, Suit>&, std::vector<PinochleMelds>&, Suit);
     void make_bid(std::vector<PinochleMelds>&, CardSet<PinochleRank, Suit>&, size_t);
     PinochleContractTeam award_contract();
+    std::string to_string(const PinochleContractTeam&);
 protected:
     PinochleDeck deck;
     // store the hands of each player in game

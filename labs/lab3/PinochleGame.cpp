@@ -87,6 +87,17 @@ PinochleContractTeam PinochleGame::award_contract(){
     }
 }
 
+std::string to_string(const PinochleContractTeam& t){
+    switch(t){
+        case PinochleContractTeam::team1:
+            return "team 1";
+        case PinochleContractTeam::team2:
+            return "team 2";
+        default:
+            return "misdeal";
+    }
+}
+
 int PinochleGame::play() {
     const int CardsInRow = 8;
     const int STOP = 0;
@@ -103,8 +114,14 @@ int PinochleGame::play() {
         // print out each player's name and then the cards in their hand to the standard output stream
         print(std::cout, CardsInRow);
         // find who wins the contract (or if there's a misdeal). If there's no misdeal, update the dealer
-        if(award_contract() != PinochleContractTeam::misdeal){
+        PinochleContractTeam award_contract_result = award_contract();
+        if(award_contract_result != PinochleContractTeam::misdeal){
             dealer = (dealer + 1) % players.size();
+            int teamIndex = static_cast<int>(award_contract_result);
+            std::cout << "contract went to " << to_string(award_contract_result) << ", score: " << scores.at(teamIndex) << std::endl;
+        }
+        else {
+            std::cout << "misdeal" << std::endl;
         }
         // use the deck's collect member function repeatedly to move the cards back out of each player's hand into the deck
         collectAll();
