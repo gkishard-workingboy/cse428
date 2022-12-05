@@ -6,6 +6,8 @@
  */
 #include "PinochleDeck.h"
 
+unsigned int PinochleDeck::PinochleRanksPointValue[PINOCHLE_NUM_RANKS] = {0, 2, 3, 4, 10, 11};
+
 std::string to_string(const PinochleRank &pr)
 {
     switch (pr)

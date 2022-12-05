@@ -16,6 +16,8 @@ const int FOUR_SAME_RANKS = 4;
 const int DOUBLE_PINOCHLE_CASE = 2;
 const int PINOCHLE_CASE = 1;
 const int SUIT_MASK = (1 << static_cast<int>(Suit::undefined)) - 1;
+std::pair<int, int> TEAM_1_INDICES(0,2);
+std::pair<int, int> TEAM_2_INDICES(1,3);
 
 unsigned int PinochleGame::PinochleMeldsPointValue[PINOCHLE_NUM_ITEMS] = { 10, 20, 40, 40, 40, 60, 80, 100, 150, 300, 400, 600, 800, 1000, 1500 };
 
@@ -24,6 +26,9 @@ PinochleGame::PinochleGame(int argc, const char* argv[]): Game(argc, argv), trum
     for (int i = Game::firstPlayerIndex; i < argc; ++i) {
         // will call default constructor of CardSet
         hands.emplace_back();
+        bids.push_back(0);
+        total_meld_values.push_back(0);
+        scores.push_back(0);
     }
 }
 
@@ -45,6 +50,43 @@ void PinochleGame::deal() {
     }
 }
 
+void PinochleGame::make_bid(std::vector<PinochleMelds>& melds, CardSet<PinochleRank, Suit>& hand, size_t playerIndex){
+    unsigned int meld_value_sum = 0;
+    for(PinochleMelds meld: melds){
+        meld_value_sum += PinochleGame::PinochleMeldsPointValue[static_cast<int>(meld)];
+    }
+    total_meld_values[playerIndex] = meld_value_sum;
+
+    unsigned int bid = meld_value_sum;
+    const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
+    std::vector<Card<PinochleRank, Suit>> cards = hand.*pdata;
+    for(Card<PinochleRank, Suit> card: cards){
+        if(card.rank == PinochleRank::undefined){
+            throw std::runtime_error("Error: undefined card found in a hand");
+        }
+        bid += PinochleDeck::PinochleRanksPointValue[static_cast<int>(card.rank)];
+    }
+    bids[playerIndex] = bid;
+}
+
+PinochleContractTeam PinochleGame::award_contract(){
+    unsigned int team1_bid = bids.at(TEAM_1_INDICES.first) + bids.at(TEAM_1_INDICES.second);
+    unsigned int team2_bid = bids.at(TEAM_2_INDICES.first) + bids.at(TEAM_2_INDICES.second);
+    if(team1_bid == team2_bid){
+        return PinochleContractTeam::misdeal;
+    }
+    else if (team1_bid > team2_bid){
+        int team1Index = static_cast<int>(PinochleContractTeam::team1);
+        scores.at(team1Index) = scores.at(team1Index) + total_meld_values.at(TEAM_1_INDICES.first) + total_meld_values.at(TEAM_1_INDICES.second);
+        return PinochleContractTeam::team1;
+    }
+    else {
+        int team2Index = static_cast<int>(PinochleContractTeam::team2);
+        scores.at(team2Index) = scores.at(team2Index) + total_meld_values.at(TEAM_2_INDICES.first) + total_meld_values.at(TEAM_2_INDICES.second);
+        return PinochleContractTeam::team2;
+    }
+}
+
 int PinochleGame::play() {
     const int CardsInRow = 8;
     const int STOP = 0;
@@ -60,7 +102,10 @@ int PinochleGame::play() {
         trump_suit = dealer_hand.back().suit;
         // print out each player's name and then the cards in their hand to the standard output stream
         print(std::cout, CardsInRow);
-
+        // find who wins the contract (or if there's a misdeal). If there's no misdeal, update the dealer
+        if(award_contract() != PinochleContractTeam::misdeal){
+            dealer = (dealer + 1) % players.size();
+        }
         // use the deck's collect member function repeatedly to move the cards back out of each player's hand into the deck
         collectAll();
         // print a string to the standard output stream that asks the user whether or not to end the game
@@ -68,8 +113,6 @@ int PinochleGame::play() {
             // if that string is "yes" the member function should return a value to indicate success, and otherwise it should repeat the sequence of steps
             return STOP;
         }
-
-        dealer = (dealer + 1) % players.size();
     }
 }
 
@@ -86,13 +129,12 @@ void PinochleGame::print(std::ostream& os, const std::size_t rc) {
         // for each hand initiate a vector and call suit_independent_evaluation to print scores
         std::vector<PinochleMelds> melds;
         suit_independent_evaluation(hands[i], melds);
-        for(Suit suit = Suit::Clubs; suit != Suit::undefined; ++suit){
-            suit_dependent_evaluation(hands[i], melds, suit);
-        }
+        suit_dependent_evaluation(hands[i], melds, trump_suit);
         std::cout << "Melds:";
         for (auto meld : melds)
             std::cout << "  " << meld;
         std::cout << std::endl;
+        make_bid(melds, hands[i], i);
     }
 }
 

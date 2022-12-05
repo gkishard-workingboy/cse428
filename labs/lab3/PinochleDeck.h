@@ -22,6 +22,8 @@ enum class PinochleRank
     undefined
 };
 
+const int PINOCHLE_NUM_RANKS = 6;
+
 std::string to_string(const PinochleRank &);
 std::ostream &operator<<(std::ostream &, const PinochleRank &);
 PinochleRank &operator++(PinochleRank &);
@@ -30,6 +32,7 @@ class PinochleDeck : public Deck<PinochleRank, Suit>
 {
 public:
     PinochleDeck();
+    static unsigned int PinochleRanksPointValue[];
 };
 
 #endif

@@ -40,15 +40,26 @@ enum class PinochleMelds
     insuitdoublerun
 };
 
+enum class PinochleContractTeam
+{
+    team1,
+    team2,
+    misdeal
+};
+
 std::ostream &operator<<(std::ostream &, const PinochleMelds &);
 
 class PinochleGame : public Game
 {
 private:
     Suit trump_suit;
+    std::vector<unsigned int> bids;
+    std::vector<unsigned int> total_meld_values;
+    std::vector<unsigned int> scores;
     void suit_independent_evaluation(const CardSet<PinochleRank, Suit> &, std::vector<PinochleMelds> &);
     void suit_dependent_evaluation(const CardSet<PinochleRank, Suit>&, std::vector<PinochleMelds>&, Suit);
-
+    void make_bid(std::vector<PinochleMelds>&, CardSet<PinochleRank, Suit>&, size_t);
+    PinochleContractTeam award_contract();
 protected:
     PinochleDeck deck;
     // store the hands of each player in game
@@ -63,6 +74,8 @@ protected:
     void collectAll();
     // ask for whether need to stop the game
     bool askForStop(std::ostream &, std::istream &);
+    //make bids
+    void make_bids(std::vector<unsigned int>&);
 
 public:
     PinochleGame(int, const char *[]);
