@@ -87,7 +87,7 @@ PinochleContractTeam PinochleGame::award_contract(){
     }
 }
 
-std::string to_string(const PinochleContractTeam& t){
+std::string PinochleGame::to_string(const PinochleContractTeam& t){
     switch(t){
         case PinochleContractTeam::team1:
             return "team 1";
