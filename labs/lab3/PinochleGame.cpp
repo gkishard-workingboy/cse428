@@ -18,6 +18,8 @@ const int PINOCHLE_CASE = 1;
 const int SUIT_MASK = (1 << static_cast<int>(Suit::undefined)) - 1;
 std::pair<int, int> TEAM_1_INDICES(0,2);
 std::pair<int, int> TEAM_2_INDICES(1,3);
+const unsigned int LAST_TRICK_BONUS = 10;
+const unsigned int WIN_THRESHOLD = 1500;
 
 unsigned int PinochleGame::PinochleMeldsPointValue[PINOCHLE_NUM_ITEMS] = { 10, 20, 40, 40, 40, 60, 80, 100, 150, 300, 400, 600, 800, 1000, 1500 };
 
@@ -291,15 +293,8 @@ bool PinochleGame::non_trump_led_play(CardSet<PinochleRank, Suit>& trick, CardSe
     
 }
 
-void PinochleGame::play_tricks(PinochleContractTeam team_with_contract){
-    std::vector<int> player_order;
-    if(team_with_contract == PinochleContractTeam::team1){
-        player_order = {TEAM_1_INDICES.first, TEAM_1_INDICES.second, TEAM_2_INDICES.first, TEAM_2_INDICES.second};
-    }
-    else {
-        player_order = {TEAM_2_INDICES.first, TEAM_2_INDICES.second, TEAM_1_INDICES.first, TEAM_1_INDICES.second};
-    }
-
+//plays one trick
+unsigned int PinochleGame::play_trick(std::vector<int>& player_order, PinochleContractTeam team_with_contract){
     CardSet<PinochleRank, Suit> trick;
     CardSet<PinochleRank, Suit> first_hand = hands[player_order.front()];
     Card<PinochleRank, Suit> first_trick_card = first_trick(trick, first_hand);
@@ -329,17 +324,65 @@ void PinochleGame::play_tricks(PinochleContractTeam team_with_contract){
         }
     }
 
+    //calculate change in running tally (if any)
+    unsigned int additional_points = 0;
     bool team1Won = player_order[winningPlayer] == TEAM_1_INDICES.first || player_order[winningPlayer] == TEAM_1_INDICES.second;
     bool team1Scores = team_with_contract == PinochleContractTeam::team1 && team1Won;
     bool team2Scores = team_with_contract == PinochleContractTeam::team2 && !team1Won;
-    if(team1Scores){
+    if(team1Scores || team2Scores){
+        additional_points = total_value(trick);
+        if(first_hand.isEmpty()){ //add 10 points if this was the last trick
+            additional_points += LAST_TRICK_BONUS;
+        }
+    }
+    /*if(team1Scores){
         int team1Index = static_cast<int>(PinochleContractTeam::team1);
         scores.at(team1Index) = scores.at(team1Index) + total_value(trick);
     }
     else if (team2Scores){
         int team2Index = static_cast<int>(PinochleContractTeam::team2);
         scores.at(team2Index) = scores.at(team2Index) + total_value(trick);
+    }*/
+
+    //update player order so winner leads next trick
+    int winningPlayerID = player_order.at(winningPlayer);
+    player_order.erase(player_order.cbegin() + winningPlayer);
+    player_order.emplace(player_order.cbegin(), winningPlayerID);
+
+    //move trick cards to deck
+    deck.collect(trick);
+
+    return additional_points;
+}
+
+//returns true if team_with_contract got a score >= 1500
+bool PinochleGame::play_tricks_for_deal(PinochleContractTeam team_with_contract){
+    unsigned int running_tally = 0;
+    std::vector<int> player_order;
+    if(team_with_contract == PinochleContractTeam::team1){
+        player_order = {TEAM_1_INDICES.first, TEAM_1_INDICES.second, TEAM_2_INDICES.first, TEAM_2_INDICES.second};
     }
+    else {
+        player_order = {TEAM_2_INDICES.first, TEAM_2_INDICES.second, TEAM_1_INDICES.first, TEAM_1_INDICES.second};
+    }
+
+    while(!hands[player_order.front()].isEmpty()){ //while players still have cards
+        running_tally += play_trick(player_order, team_with_contract);
+    }
+
+    unsigned int contract_total_bid = 0;
+    if(team_with_contract == PinochleContractTeam::team1){
+        contract_total_bid = bids.at(TEAM_1_INDICES.first) + bids.at(TEAM_1_INDICES.second);
+    }
+    else {
+        contract_total_bid = bids.at(TEAM_2_INDICES.first) + bids.at(TEAM_2_INDICES.second);
+    }
+    if(running_tally >= contract_total_bid){
+        int contractTeamIndex = static_cast<int>(team_with_contract);
+        scores.at(contractTeamIndex) = scores.at(contractTeamIndex) + contract_total_bid;
+        return scores.at(contractTeamIndex) >= WIN_THRESHOLD;
+    }
+    return false;
 }
 
 int PinochleGame::play() {
@@ -363,7 +406,7 @@ int PinochleGame::play() {
             dealer = (dealer + 1) % players.size();
             int teamIndex = static_cast<int>(award_contract_result);
             std::cout << "contract went to " << to_string(award_contract_result) << ", score: " << scores.at(teamIndex) << std::endl;
-            play_tricks(award_contract_result);
+            play_tricks_for_deal(award_contract_result);
         }
         else {
             std::cout << "misdeal" << std::endl;

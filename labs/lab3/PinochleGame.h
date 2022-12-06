@@ -68,7 +68,8 @@ private:
     void add_to_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Suit, bool);
     void add_lowest_non_trump(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Suit);
     bool non_trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&, std::vector<Card<PinochleRank, Suit>>&);
-    void play_tricks(PinochleContractTeam);
+    unsigned int play_trick(std::vector<int>&, PinochleContractTeam);
+    bool play_tricks_for_deal(PinochleContractTeam);
 protected:
     PinochleDeck deck;
     // store the hands of each player in game
