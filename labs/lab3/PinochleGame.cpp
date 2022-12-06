@@ -94,6 +94,15 @@ PinochleContractTeam PinochleGame::award_contract(){
     }
 }
 
+void PinochleGame::print_contract_result(std::ostream& os, PinochleContractTeam team){
+    if(team == PinochleContractTeam::misdeal){
+        os << "misdeal, re-dealing cards..." << std::endl;
+    }
+    else {
+        os << "contract went to " << to_string(team) << ", score: " << scores.at(static_cast<int>(team)) << std::endl;
+    }
+}
+
 std::string PinochleGame::to_string(const PinochleContractTeam& t){
     switch(t){
         case PinochleContractTeam::team1:
@@ -402,22 +411,17 @@ int PinochleGame::play() {
         print(std::cout, CardsInRow);
         // find who wins the contract (or if there's a misdeal). If there's no misdeal, update the dealer
         PinochleContractTeam award_contract_result = award_contract();
+        print_contract_result(std::cout, award_contract_result);
         if(award_contract_result != PinochleContractTeam::misdeal){
             dealer = (dealer + 1) % players.size();
-            int teamIndex = static_cast<int>(award_contract_result);
-            std::cout << "contract went to " << to_string(award_contract_result) << ", score: " << scores.at(teamIndex) << std::endl;
             play_tricks_for_deal(award_contract_result);
         }
-        else {
-            std::cout << "misdeal" << std::endl;
-        }
-        // use the deck's collect member function repeatedly to move the cards back out of each player's hand into the deck
-        collectAll();
         // print a string to the standard output stream that asks the user whether or not to end the game
         if (askForStop(std::cout, std::cin)) {
             // if that string is "yes" the member function should return a value to indicate success, and otherwise it should repeat the sequence of steps
             return STOP;
         }
+
     }
 }
 
@@ -435,10 +439,10 @@ void PinochleGame::print(std::ostream& os, const std::size_t rc) {
         std::vector<PinochleMelds> melds;
         suit_independent_evaluation(hands[i], melds);
         suit_dependent_evaluation(hands[i], melds, trump_suit);
-        std::cout << "Melds:";
+        os << "Melds:";
         for (auto meld : melds)
-            std::cout << "  " << meld;
-        std::cout << std::endl;
+            os << "  " << meld;
+        os << std::endl;
         make_bid(melds, hands[i], i);
     }
 }
@@ -670,11 +674,18 @@ void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& 
     }
 
     int marriage = king_all_suits & queen_all_suits;
-    if((marriage & passed_suit_mask) == passed_suit_mask){
-        pmv.push_back(PinochleMelds::insuitmarriage);
-    }
-    else if(marriage > 0){
-        pmv.push_back(PinochleMelds::offsuitmarriage);
+    int mask = 1;
+    int mask_end = 1 << (static_cast<int>(Suit::undefined));
+    while(mask < mask_end){
+        if((marriage & mask) == mask){
+            if(mask == passed_suit_mask){
+                pmv.push_back(PinochleMelds::insuitmarriage);
+            }
+            else {
+                pmv.push_back(PinochleMelds::offsuitmarriage);
+            }
+        }
+        mask << 1;
     }
 
     if(dix){

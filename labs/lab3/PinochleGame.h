@@ -61,6 +61,7 @@ private:
     unsigned int total_value(CardSet<PinochleRank, Suit>&);
     void make_bid(std::vector<PinochleMelds>&, CardSet<PinochleRank, Suit>&, size_t);
     PinochleContractTeam award_contract();
+    void print_contract_result(std::ostream&, PinochleContractTeam);
     std::string to_string(const PinochleContractTeam&);
     Card<PinochleRank, Suit> first_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&);
     bool trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&);
