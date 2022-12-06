@@ -685,7 +685,7 @@ void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& 
                 pmv.push_back(PinochleMelds::offsuitmarriage);
             }
         }
-        mask << 1;
+        mask = mask << 1;
     }
 
     if(dix){
