@@ -61,6 +61,9 @@ private:
     void make_bid(std::vector<PinochleMelds>&, CardSet<PinochleRank, Suit>&, size_t);
     PinochleContractTeam award_contract();
     std::string to_string(const PinochleContractTeam&);
+    Card<PinochleRank, Suit> first_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&);
+    bool trump_led_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&);
+    void play_tricks(PinochleContractTeam);
 protected:
     PinochleDeck deck;
     // store the hands of each player in game
