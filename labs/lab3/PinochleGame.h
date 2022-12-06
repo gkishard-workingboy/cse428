@@ -58,13 +58,16 @@ private:
     std::vector<unsigned int> scores;
     void suit_independent_evaluation(const CardSet<PinochleRank, Suit> &, std::vector<PinochleMelds> &);
     void suit_dependent_evaluation(const CardSet<PinochleRank, Suit>&, std::vector<PinochleMelds>&, Suit);
+    unsigned int total_value(CardSet<PinochleRank, Suit>&);
     void make_bid(std::vector<PinochleMelds>&, CardSet<PinochleRank, Suit>&, size_t);
     PinochleContractTeam award_contract();
     std::string to_string(const PinochleContractTeam&);
     Card<PinochleRank, Suit> first_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&);
     bool trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&);
     void get_highest_or_lowest_in_suit(CardSet<PinochleRank, Suit>&, Suit, bool, std::vector<Card<PinochleRank, Suit>>&);
-    void non_trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&, Suit, std::vector<Card<PinochleRank, Suit>>&);
+    void add_to_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Suit, bool);
+    void add_lowest_non_trump(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Suit);
+    bool non_trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&, std::vector<Card<PinochleRank, Suit>>&);
     void play_tricks(PinochleContractTeam);
 protected:
     PinochleDeck deck;
