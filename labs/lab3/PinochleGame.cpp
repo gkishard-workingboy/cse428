@@ -133,7 +133,7 @@ Card<PinochleRank, Suit> PinochleGame::first_trick(CardSet<PinochleRank, Suit>& 
 bool PinochleGame::trump_led_trick(CardSet<PinochleRank, Suit>& trick, CardSet<PinochleRank, Suit>& hand, Card<PinochleRank, Suit>& maxTrumpCard){
     const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
     std::vector<Card<PinochleRank, Suit>> hand_cards = hand.*pdata;
-    std::sort(hand_cards.begin(), hand_cards.end(), cardRankIsSmaller<PinochleRank, Suit>);
+    std::sort(hand_cards.begin(), hand_cards.end(), cardSuitIsSmaller<PinochleRank, Suit>);
     bool trump_card_found = false;
     bool new_winner = false;
     int trick_card_position = 0;
@@ -169,6 +169,7 @@ bool PinochleGame::trump_led_trick(CardSet<PinochleRank, Suit>& trick, CardSet<P
         }
     }
     else {
+        std::sort(hand_cards.begin(), hand_cards.end(), cardRankIsSmaller<PinochleRank, Suit>);
         std::reverse(hand_cards.begin(), hand_cards.end());
         hand >> trick;
     }
@@ -203,7 +204,7 @@ void PinochleGame::play_tricks(PinochleContractTeam team_with_contract){
         }
     }
     else {
-        
+
     }
 }
 
