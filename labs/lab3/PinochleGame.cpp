@@ -98,6 +98,115 @@ std::string PinochleGame::to_string(const PinochleContractTeam& t){
     }
 }
 
+Card<PinochleRank, Suit> PinochleGame::first_trick(CardSet<PinochleRank, Suit>& trick, CardSet<PinochleRank, Suit>& first_hand){
+    const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
+    std::vector< Card<PinochleRank, Suit> > first_hand_cards = first_hand.*pdata;
+    std::sort(first_hand_cards.begin(), first_hand_cards.end(), cardRankIsSmaller<PinochleRank, Suit>);
+    PinochleRank maxRank = first_hand_cards.back().rank;
+    bool playing_trump_card = false;
+    int trick_card_position = 0;
+    for(std::vector< Card<PinochleRank, Suit> >::reverse_iterator rit = first_hand_cards.rbegin(); rit != first_hand_cards.rend() && (*rit).rank == maxRank; ++rit){
+        if((*rit).suit == trump_suit){
+            playing_trump_card = true;
+            break;
+        }
+        ++trick_card_position;
+    }
+    if(playing_trump_card){
+        CardSet<PinochleRank, Suit> tmp;
+        for(int i = 0; i < trick_card_position; ++i){
+            first_hand >> tmp;
+        }
+        first_hand >> trick;
+        while(!tmp.isEmpty()){
+            tmp >> first_hand;
+        }
+    }
+    else{
+        first_hand >> trick;
+    }
+
+    std::vector< Card<PinochleRank, Suit> > trick_cards = trick.*pdata;
+    return trick_cards.back();
+}
+
+bool PinochleGame::trump_led_trick(CardSet<PinochleRank, Suit>& trick, CardSet<PinochleRank, Suit>& hand, Card<PinochleRank, Suit>& maxTrumpCard){
+    const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
+    std::vector<Card<PinochleRank, Suit>> hand_cards = hand.*pdata;
+    std::sort(hand_cards.begin(), hand_cards.end(), cardRankIsSmaller<PinochleRank, Suit>);
+    bool trump_card_found = false;
+    bool new_winner = false;
+    int trick_card_position = 0;
+    std::vector< Card<PinochleRank, Suit> >::reverse_iterator rit = hand_cards.rbegin();
+    while(rit != hand_cards.rend()){
+        if((*rit).suit == trump_suit){
+            trump_card_found = true;
+            if((*rit).rank > maxTrumpCard.rank){
+                maxTrumpCard = *rit;
+                new_winner = true;
+            }
+            else {
+                ++rit;
+                while(rit != hand_cards.rend() && (*rit).suit == trump_suit){
+                    ++trick_card_position;
+                    ++rit;
+                }
+            }
+            break;
+        }
+        ++trick_card_position;
+        ++rit;
+    }
+
+    if(trump_card_found){
+        CardSet<PinochleRank, Suit> tmp;
+        for(int i = 0; i < trick_card_position; ++i){
+            hand >> tmp;
+        }
+        hand >> trick;
+        while(!tmp.isEmpty()){
+            tmp >> hand;
+        }
+    }
+    else {
+        std::reverse(hand_cards.begin(), hand_cards.end());
+        hand >> trick;
+    }
+
+    return new_winner;
+}
+
+void PinochleGame::play_tricks(PinochleContractTeam team_with_contract){
+    std::vector<int> player_order;
+    if(team_with_contract == PinochleContractTeam::team1){
+        player_order = {TEAM_1_INDICES.first, TEAM_1_INDICES.second, TEAM_2_INDICES.first, TEAM_2_INDICES.second};
+    }
+    else {
+        player_order = {TEAM_2_INDICES.first, TEAM_2_INDICES.second, TEAM_1_INDICES.first, TEAM_1_INDICES.second};
+    }
+
+    CardSet<PinochleRank, Suit> trick;
+    CardSet<PinochleRank, Suit> first_hand = hands[player_order.front()];
+    Card<PinochleRank, Suit> first_trick_card = first_trick(trick, first_hand);
+    Suit leading_suit = first_trick_card.suit;
+    Card<PinochleRank, Suit> winningCard = first_trick_card;
+    int winningPlayer = 0; //tracks index (of player_order) that points to winner
+    const int secondPlayerIndex = 1;
+
+    if(leading_suit == trump_suit){
+        for(int i = secondPlayerIndex; i < player_order.size(); ++i){
+            int currentPlayer = player_order.at(i);
+            bool new_winner = trump_led_trick(trick, hands[currentPlayer], winningCard);
+            if(new_winner){
+                winningPlayer = i;
+            }
+        }
+    }
+    else {
+        
+    }
+}
+
 int PinochleGame::play() {
     const int CardsInRow = 8;
     const int STOP = 0;
@@ -119,6 +228,7 @@ int PinochleGame::play() {
             dealer = (dealer + 1) % players.size();
             int teamIndex = static_cast<int>(award_contract_result);
             std::cout << "contract went to " << to_string(award_contract_result) << ", score: " << scores.at(teamIndex) << std::endl;
+            play_tricks(award_contract_result);
         }
         else {
             std::cout << "misdeal" << std::endl;
