@@ -63,6 +63,7 @@ private:
     PinochleContractTeam award_contract();
     void print_contract_result(std::ostream&, PinochleContractTeam);
     std::string to_string(const PinochleContractTeam&);
+    void add_ith_card_to_trick(CardSet<PinochleRank, Suit>& trick, CardSet<PinochleRank, Suit>& hand, int remove_index);
     Card<PinochleRank, Suit> first_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&);
     bool trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&);
     void get_highest_or_lowest_in_suit(CardSet<PinochleRank, Suit>&, Suit, bool, std::vector<Card<PinochleRank, Suit>>&);
