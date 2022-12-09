@@ -39,6 +39,11 @@ enum class HoldEmHandRank {
 	undefined
 };
 
+enum class HoldEmAction {
+	fold,
+	call,
+	raise
+};
 
 class HoldEmGame : public Game {
 private:
@@ -50,7 +55,8 @@ protected:
 	std::vector<CardSet<HoldEmRank, Suit>> hands;
 	CardSet<HoldEmRank, Suit> board;
 	virtual void deal();
-	virtual void bet();
+	void bet();
+	std::vector<HoldEmAction> action(const CardSet<HoldEmRank, Suit>&);
 	// * DESIGN:
 	// * modularize play() by extract parts to 2 member methods
 	void collectAll();

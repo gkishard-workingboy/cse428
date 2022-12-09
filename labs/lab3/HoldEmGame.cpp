@@ -18,11 +18,12 @@ const int STD_HAND_NUM = 5;
 const int ACE_OFFSET = 1;
 const int ACE_LOW = 0;
 
-HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv), state(HoldEmState::preflop), scores(players.size(), 60), input_scores(players.size(), 0), playerStatus(players.size(), true), pot(0) {
+HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv), state(HoldEmState::preflop), input_scores(players.size(), 0), playerStatus(players.size(), true), pot(0) {
     // create as many hands as players in the game
     for (int i = Game::firstPlayerIndex; i < argc; ++i) {
         // will call default constructor of CardSet
         hands.emplace_back();
+        this->scores.push_back(60);
     }
 }
 
@@ -55,25 +56,79 @@ void HoldEmGame::deal() {
     // do nothing for other states
 }
 
+vector<HoldEmAction> HoldEmGame::action(const CardSet<HoldEmRank, Suit>& cs) {
+    /*if (this->state == HoldEmState::flop) {
+    }*/
+
+    CardSet<HoldEmRank, Suit> hand(cs);
+    vector<Card<HoldEmRank, Suit>> CardSet<HoldEmRank, Suit>::* pdata = CardSet<HoldEmRank, Suit>::data();
+    vector<Card<HoldEmRank, Suit>>& cards = hand.*pdata;
+    if (cards[0].rank == cards[1].rank && cards[0].rank == HoldEmRank::Ace) {
+        vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::raise };
+        return result;
+    }
+    else if (cards[0].rank == cards[1].rank && ((cards[0].rank == HoldEmRank::King) || (cards[0].rank == HoldEmRank::Queen) || (cards[0].rank == HoldEmRank::Jack))) {
+        vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::call };
+        return result;
+    }
+    else if (cards[0].suit == cards[1].suit) {
+        vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
+        return result;
+    }
+    else if (((static_cast<int>(cards[0].rank) == static_cast<int>(cards[1].rank) + 1) && (cards[1].rank > HoldEmRank::Three)) || ((static_cast<int>(cards[1].rank) == static_cast<int>(cards[0].rank) + 1) && (cards[0].rank > HoldEmRank::Three))) {
+        vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
+        return result;
+    }
+    else if (cards[0].rank == cards[1].rank) {
+        vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
+        return result;
+    }
+    else {
+        vector<HoldEmAction> result{ HoldEmAction::fold,HoldEmAction::fold };
+        return result;
+    }
+
+}
+
 void HoldEmGame::bet() {
+    if (this->state == HoldEmState::flop) {
+        size_t small_blind = (1 + dealer) % players.size();
+        size_t big_blind = (2 + dealer) % players.size();
+        scores[small_blind] -= 1;
+        scores[big_blind] -= 2;
+        input_scores[small_blind] += 1;
+        input_scores[big_blind] += 2;
+    }
+
     bool flag = true;
+    bool raiseFlag = false;
     int largest_bet_of_round = 100; //initiate a value for the largest bet of the round
     while (flag == true) {
+        for (auto i : scores)
+            std::cout << i << ' ';
         long unsigned int totalPass = 0;
         int largest_bet; // largest value for call/raise check max value
-        for (size_t i = 0; i < players.size(); ++i) {
+        for (size_t k = 0; k < players.size(); ++k) {
+            size_t i = (k + dealer + 3) % players.size();
+
             if (playerStatus[i] == false || input_scores[i] == largest_bet_of_round || scores[i] == 0) //will pass if conditions satisfy
                 continue;
 
             cout << "Player " << i << ", Please input your action, choose from 'fold','call','raise'." << endl;
-            string playerAction;
-            cin >> playerAction;
+            vector<HoldEmAction> handAction = action(hands[i]);
+            HoldEmAction playerAction;
+            if (raiseFlag == false) {
+                playerAction = handAction[0];
+            }
+            else {
+                playerAction = handAction[1];
+            }
 
-            if (playerAction == "fold") {
+            if (playerAction == HoldEmAction::fold) {
                 playerStatus[i] = false;
                 cout << "Player " << i << " folded." << endl;
             }
-            else if (playerAction == "call") {
+            else if (playerAction == HoldEmAction::call) {
                 largest_bet = *max_element(std::begin(input_scores), std::end(input_scores));
                 if (scores[i] <= largest_bet) {
                     pot = pot + scores[i];
@@ -89,7 +144,8 @@ void HoldEmGame::bet() {
                 cout << "Player " << i << " successfully called." << endl;
                 cout << "Player " << i << " left with " << scores[i] << "." << endl;
             }
-            else if (playerAction == "raise") {
+            else if (playerAction == HoldEmAction::raise) {
+                raiseFlag = true;
                 largest_bet = *max_element(std::begin(input_scores), std::end(input_scores));
                 if (scores[i] <= largest_bet) {
                     cout << "Player " << i << " opted to ALL-IN" << endl;
@@ -224,7 +280,10 @@ int HoldEmGame::play() {
     while (true) {
         // shuffle card set state to preflop
         deck.shuffle();
+
         this->state = HoldEmState::preflop;
+        this->pot = 0;
+
         // deal the card to players
         this->deal();
         // print each player info and hand
@@ -260,19 +319,6 @@ int HoldEmGame::play() {
         this->deal();
         cout << "BOARD (turn): ";
         board.print(cout, boardWidth);
-
-        vector<HoldEmGame::PlayerHand> phs1;
-        for (size_t i = 0; i < players.size(); ++i) {
-            phs1.emplace_back(hands[i], i, HoldEmHandRank::undefined);
-        }
-        for (size_t i = 0; i < phs1.size(); ++i) {
-            CardSet<HoldEmRank, Suit> tmpcs(board);
-            while (!tmpcs.isEmpty()) {
-                // * no risk for throwing exception
-                tmpcs >> phs1[i].cards;
-            }
-            phs1[i].rank = holdem_hand_evaluation(phs1[i].cards);
-        }
 
         // deal river cards to board
         this->deal();
