@@ -139,6 +139,7 @@ int PinochleGame::play() {
             dealer = (dealer + 1) % players.size();
             play_tricks_for_deal(award_contract_result);
         }*/
+        collectAll();
         // print a string to the standard output stream that asks the user whether or not to end the game
         if (askForStop(std::cout, std::cin)) {
             // if that string is "yes" the member function should return a value to indicate success, and otherwise it should repeat the sequence of steps
