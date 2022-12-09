@@ -102,7 +102,7 @@ void PinochleGame::print_contract_result(std::ostream& os, PinochleContractTeam 
         os << "misdeal, re-dealing cards..." << std::endl;
     }
     else {
-        os << "contract went to " << to_string(team) << ", score: " << scores.at(static_cast<int>(team)) << std::endl;
+        os << "contract went to " << to_string(team) << ", running tally: " << running_tally.at(static_cast<int>(team)) << std::endl;
     }
 }
 
