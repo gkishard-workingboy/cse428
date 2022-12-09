@@ -50,11 +50,16 @@ protected:
 	std::vector<CardSet<HoldEmRank, Suit>> hands;
 	CardSet<HoldEmRank, Suit> board;
 	virtual void deal();
+	virtual void bet();
 	// * DESIGN:
 	// * modularize play() by extract parts to 2 member methods
 	void collectAll();
 	void print(std::ostream&, const std::size_t);
 	bool askForStop(std::ostream&, std::istream&);
+	std::vector<int> scores;
+	std::vector<int> input_scores;
+	std::vector<bool> playerStatus;
+	int pot;
 
 public:
 	HoldEmGame(int, const char* []);
