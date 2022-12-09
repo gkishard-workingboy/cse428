@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab2/PinochleGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-25 14:31:48
- * @LastEditTime: 2022-10-29 23:25:15
+ * @LastEditTime: 2022-12-09 16:16:03
  * @Description: Definition to PinochleGame.h
  *
  */
@@ -19,7 +19,7 @@ const int SUIT_MASK = (1 << static_cast<int>(Suit::undefined)) - 1;
 
 unsigned int PinochleGame::PinochleMeldsPointValue[PINOCHLE_NUM_ITEMS] = { 10, 20, 40, 40, 40, 60, 80, 100, 150, 300, 400, 600, 800, 1000, 1500 };
 
-PinochleGame::PinochleGame(int argc, const char* argv[]): Game(argc, argv) {
+PinochleGame::PinochleGame(int argc, const char* argv[]) : Game(argc, argv) {
     // create as many hands as players in the game
     for (int i = Game::firstPlayerIndex; i < argc; ++i) {
         // will call default constructor of CardSet

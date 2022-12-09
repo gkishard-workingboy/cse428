@@ -1,8 +1,8 @@
 /*
- * @FilePath: /428cpp/labs/lab2/HoldEmGame.h
+ * @FilePath: /428cpp/labs/lab3/HoldEmGame.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-10-25 16:58:39
+ * @LastEditTime: 2022-12-09 17:35:59
  * @Description: Declaration for Hold'Em Game states and class.
  *
  */
@@ -40,15 +40,20 @@ enum class HoldEmHandRank {
 };
 
 
-class HoldEmGame : public Game {
+class HoldEmGame: public Game {
 private:
 	HoldEmHandRank holdem_hand_evaluation(const CardSet<HoldEmRank, Suit>&);
 
 protected:
+	int pot;
 	HoldEmState state;
 	HoldEmDeck deck;
 	std::vector<CardSet<HoldEmRank, Suit>> hands;
 	CardSet<HoldEmRank, Suit> board;
+	std::vector<int> scores;
+	std::vector<int> input_scores;
+	std::vector<bool> playerStatus;
+
 	virtual void deal();
 	virtual void bet();
 	// * DESIGN:
@@ -56,10 +61,6 @@ protected:
 	void collectAll();
 	void print(std::ostream&, const std::size_t);
 	bool askForStop(std::ostream&, std::istream&);
-	std::vector<int> scores;
-	std::vector<int> input_scores;
-	std::vector<bool> playerStatus;
-	int pot;
 
 public:
 	HoldEmGame(int, const char* []);
