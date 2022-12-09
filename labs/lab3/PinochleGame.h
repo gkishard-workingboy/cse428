@@ -56,6 +56,7 @@ private:
     std::vector<unsigned int> bids;
     std::vector<unsigned int> total_meld_values;
     std::vector<unsigned int> scores;
+    std::vector<unsigned int> running_tally;
     void suit_independent_evaluation(const CardSet<PinochleRank, Suit> &, std::vector<PinochleMelds> &);
     void suit_dependent_evaluation(const CardSet<PinochleRank, Suit>&, std::vector<PinochleMelds>&, Suit);
     unsigned int total_value(CardSet<PinochleRank, Suit>&);
