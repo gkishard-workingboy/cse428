@@ -72,7 +72,7 @@ private:
     void add_to_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, PinochleRank, Suit);
     PinochleRank trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, PinochleRank);
     pair<PinochleRank, PinochleRank> non_trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, pair<PinochleRank, PinochleRank>, Suit);
-    int do_trick(PinochleContractTeam);
+    int do_trick(PinochleContractTeam, vector<int>&);
     int player_with_card(CardSet<PinochleRank, Suit>&, vector<int>&, PinochleRank, Suit);
 protected:
     PinochleDeck deck;
