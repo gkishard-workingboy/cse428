@@ -22,6 +22,7 @@
 using std::vector;
 using std::pair;
 using std::string;
+using std::ostream;
 
 const int PINOCHLE_NUM_ITEMS = 15;
 
@@ -76,11 +77,16 @@ private:
     void add_to_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, PinochleRank, Suit);
     PinochleRank trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, PinochleRank);
     pair<PinochleRank, PinochleRank> non_trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, pair<PinochleRank, PinochleRank>, Suit);
-    int do_trick(PinochleContractTeam, vector<int>&, bool);
+    int do_trick(PinochleContractTeam, vector<int>&, int, bool);
     int player_with_card(CardSet<PinochleRank, Suit>&, vector<int>&, PinochleRank, Suit);
-    bool update_scores(PinochleContractTeam contract_team);
+    unsigned int update_scores(PinochleContractTeam contract_team);
     string team_members_to_string(PinochleContractTeam);
     void reset_member_variables();
+    void print_trick(ostream& os, int trick_number, Suit leading_suit, vector<Card<PinochleRank, Suit>>& trick_cards, 
+    vector<int>& player_order, int winner, Card<PinochleRank, Suit> winning_card, PinochleContractTeam contract_team);
+    void print_after_last_trick(ostream& os, PinochleContractTeam contract_team, unsigned int score_increase);
+    PinochleContractTeam get_other_team(PinochleContractTeam t);
+    void print_game_over(ostream& os, PinochleContractTeam winning_team);
 protected:
     PinochleDeck deck;
     // store the hands of each player in game
