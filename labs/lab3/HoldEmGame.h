@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-09 17:35:59
+ * @LastEditTime: 2022-12-09 21:32:56
  * @Description: Declaration for Hold'Em Game states and class.
  *
  */
@@ -17,6 +17,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <utility>
 
 enum class HoldEmState {
 	preflop,
@@ -67,6 +68,8 @@ protected:
 	void collectAll();
 	void print(std::ostream&, const std::size_t);
 	bool askForStop(std::ostream&, std::istream&);
+	void evalCombinations(CardSet<HoldEmRank, Suit>&, CardSet<HoldEmRank, Suit>&, HoldEmGame::PlayerHand&);
+	void printPlayerHand(std::ostream&, std::vector<HoldEmGame::PlayerHand>&)
 
 public:
 	HoldEmGame(int, const char* []);
@@ -79,6 +82,8 @@ public:
 		HoldEmHandRank rank;
 
 		PlayerHand(CardSet<HoldEmRank, Suit>&, int, HoldEmHandRank);
+
+		PlayerHand& operator=(const PlayerHand&);
 	};
 
 };

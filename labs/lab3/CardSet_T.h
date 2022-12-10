@@ -1,8 +1,8 @@
 /*
- * @FilePath: /428cpp/labs/lab2/CardSet_T.h
+ * @FilePath: /428cpp/labs/lab3/CardSet_T.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-24 22:18:03
- * @LastEditTime: 2022-10-25 16:49:08
+ * @LastEditTime: 2022-12-09 21:00:01
  * @Description:
  *
  */

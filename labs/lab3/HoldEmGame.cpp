@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-09 20:06:25
+ * @LastEditTime: 2022-12-09 21:52:47
  * @Description: Definition to HoldEmGame.h
  *
  */
@@ -221,6 +221,69 @@ bool HoldEmGame::askForStop(std::ostream& os, std::istream& is) {
     return "yes" == input;
 }
 
+void HoldEmGame::evalCombinations(CardSet<HoldEmRank, Suit>& handCards, CardSet<HoldEmRank, Suit> boardCards, HoldEmGame::PlayerHand& playerHand) {
+    // combinations vector
+    std::vector<int> combos;
+    CardSet<HoldEmRank, Suit> cset;
+    // always keep last card in combination.
+    boardCards >> cset;
+    auto pdata = CardSet<HoldEmRank, Suit>::data();
+    std::vector<Card<HoldEmRank, Suit>>& boardVec = boardCards.*pdata;
+    std::vector<Card<HoldEmRank, Suit>>& handVec = handCards.*pdata;
+    std::vector<Card<HoldEmRank, Suit>> restCards = boardVec;
+    restCards.insert(restCards.end(), handCards.begin(), handCards.end());
+    int totalCards = boardVec.size() + handCards;
+    // index of last element
+    int lastPos = restCards.size() - 1;
+    // number of cards that need to be removed in each combination.
+    int missed = totalCards - STD_HAND_NUM;
+
+    for (int i = 0; i < missed; ++i) {
+        vector<int> tmp;
+        if (combos.empty()) {
+            // always keep last position in consideration, so minus one
+            for (int j = 0; j <= lastPos; ++j) {
+                tmp.push_back(1 << j);
+            }
+        } else {
+            for (int prevCombo : combos) {
+                for (int j = lastPos; ((1 << j) & prevCombo) == 0; --j) {
+                    tmp.push_back((1 << j) & prevCombo);
+                }
+            }
+        }
+        combs = std::move(tmp);
+    }
+    // test
+    for (int i = 0; i < combos.size(); ++i) std::cout << combos[i] << " ";
+    std::cout << std::endl;
+
+    for (int combo : combos) {
+        HoldEmGame::PlayerHand tmpPH(cset, playerHand.name, HoldEmHandRank::undefined);
+        std::vector<Card<HoldEmRank, Suit>>& phVec = tmpPH.cards.*pdata;
+        for (int i = 0; i < totalCards.size(); ++i) {
+            if (combo & (1 << i)) continue;
+            phVec.push_back(totalCards[i]);
+        }
+        tmpPH.rank = holdem_hand_evaluation(tmpPH.cards);
+        if (playerHand < tmpPH) {
+            playerHand = tmpPH;
+        }
+    }
+}
+
+void HoldEmGame::printPlayerHand(std::ostream& os, std::vector<HoldEmGame::PlayerHand>& playerHands) {
+    const int boardWidth = 5;
+    sort(playerHands.begin(), playerHands.end());
+    reverse(playerHands.begin(), playerHands.end());
+    for (auto& [cst, nid, rank] : playerHands) {
+        cout << "Player: " << players[nid] << endl;
+        cst.print(cout, boardWidth);
+        cout << "Hand rank: " << rank << endl;
+    }
+}
+
+
 std::ostream& operator<<(std::ostream& os, const HoldEmHandRank& herank) {
     string label;
     switch (herank) {
@@ -293,23 +356,28 @@ int HoldEmGame::play() {
             }
             phs[i].rank = holdem_hand_evaluation(phs[i].cards);
         }
-        sort(phs.begin(), phs.end());
-        reverse(phs.begin(), phs.end());
-        for (auto& [cst, nid, rank] : phs) {
-            cout << "Player: " << players[nid] << endl;
-            cst.print(cout, boardWidth);
-            cout << "Hand rank: " << rank << endl;
-        }
+
+        this->printPlayerHand(os, phs);
 
         // deal turn cards to board
         this->deal();
         cout << "BOARD (turn): ";
         board.print(cout, boardWidth);
 
+        for (size_t i = 0; i < phs.size(); ++i) {
+            evalCombinations(hands[phs[i].name], board, phs[i]);
+        }
+        this->printPlayerHand(os, phs);
+
         // deal river cards to board
         this->deal();
         cout << "BOARD (river): ";
         board.print(cout, boardWidth);
+
+        for (size_t i = 0; i < phs.size(); ++i) {
+            evalCombinations(hands[phs[i].name], board, phs[i]);
+        }
+        this->printPlayerHand(os, phs);
 
         // collect hands and board
         collectAll();
@@ -323,6 +391,13 @@ int HoldEmGame::play() {
 }
 
 HoldEmGame::PlayerHand::PlayerHand(CardSet<HoldEmRank, Suit>& cardset, int playername, HoldEmHandRank hhr) : cards(cardset), name(playername), rank(hhr) { }
+
+PlayerHand& HoldEmGame::PlayerHand::operator=(const PlayerHand& rhs) {
+    this->name = rhs.name;
+    this->rank = rhs.rank;
+    this->cards = rhs.cards;
+    return *this;
+}
 
 bool operator<(const HoldEmGame::PlayerHand& lhs, const HoldEmGame::PlayerHand& rhs) {
     // if rank is same, goes into complex logic
