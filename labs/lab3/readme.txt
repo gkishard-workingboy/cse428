@@ -1,4 +1,4 @@
-LAB2
+LAB3
 Team member
 Zhikuan Wei(w.zhikuan@wustl.edu)
 Haoyuan Ye(haoyuan.y@wustl.edu)
@@ -6,22 +6,8 @@ Julia Zeng(julia.z@wustl.edu)
 
 Errors and Warnings:
 Errors:
-1. multiple types in one declaration  };
-Missing close brace after declaration of enumeration class.
-
-2. error: ‘template<class R, class S> class CardSet’ used without template parameters
-Missing parameters for using that template as a type.
-
-3. error: expected unqualified-id before ‘*’ token
-Missing same qualifier as we declared for that member data pointer.
-
-4. error: no matching function for call to ‘std::vector<Card<HoldEmRank, Suit>, std::allocator<Card<HoldEmRank, Suit> > >::erase(std::reverse_iterator<__gnu_cxx::__normal_iterator<Card<HoldEmRank, Suit>*, std::vector<Card<HoldEmRank, Suit>, std::allocator<Card<HoldEmRank, Suit> > > > >, std::reverse_iterator<__gnu_cxx::__normal_iterator<Card<HoldEmRank, Suit>*, std::vector<Card<HoldEmRank, Suit>, std::allocator<Card<HoldEmRank, Suit> > > > >&)’
-Find out that the reverse_iterator cannot be taken as parameter for vector::erase().
-
-5. error: jump to case label [-fpermissive]
-             case HoldEmHandRank::threeofakind:
-The problem is that variables declared in one case are still visible in the subsequent cases unless an explicit { } block is used, but they will not be initialized because the initialization code belongs to another case.
-Credit link: https://stackoverflow.com/questions/5685471/error-jump-to-case-label-in-switch-statement
+1. Missing declaration of HoldEmGame or HoldEmGame::PlayerHand
+It is due to the reason that the function need that type is declared before that type, so I decide to put forward the declaration of that type, but turns out that it is impossible for a nested struct to be forward declared, so I just reorder the code.
 
 Warnings:
 We meet tons of warnings, but all of them just appear as the accompany of errors, so once we fixed the error, the warning just not bother us anymore. 

@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-09 21:32:56
+ * @LastEditTime: 2022-12-09 22:10:01
  * @Description: Declaration for Hold'Em Game states and class.
  *
  */
@@ -47,6 +47,21 @@ enum class HoldEmAction {
 };
 
 class HoldEmGame: public Game {
+public:
+	HoldEmGame(int, const char* []);
+	virtual int play() override;
+
+	struct PlayerHand {
+	public:
+		CardSet<HoldEmRank, Suit> cards;
+		int name;
+		HoldEmHandRank rank;
+
+		PlayerHand(CardSet<HoldEmRank, Suit>&, int, HoldEmHandRank);
+
+		HoldEmGame::PlayerHand& operator=(const HoldEmGame::PlayerHand&);
+	};
+
 private:
 	HoldEmHandRank holdem_hand_evaluation(const CardSet<HoldEmRank, Suit>&);
 
@@ -68,24 +83,8 @@ protected:
 	void collectAll();
 	void print(std::ostream&, const std::size_t);
 	bool askForStop(std::ostream&, std::istream&);
-	void evalCombinations(CardSet<HoldEmRank, Suit>&, CardSet<HoldEmRank, Suit>&, HoldEmGame::PlayerHand&);
-	void printPlayerHand(std::ostream&, std::vector<HoldEmGame::PlayerHand>&)
-
-public:
-	HoldEmGame(int, const char* []);
-	virtual int play() override;
-
-	struct PlayerHand {
-	public:
-		CardSet<HoldEmRank, Suit> cards;
-		int name;
-		HoldEmHandRank rank;
-
-		PlayerHand(CardSet<HoldEmRank, Suit>&, int, HoldEmHandRank);
-
-		PlayerHand& operator=(const PlayerHand&);
-	};
-
+	void evalCombinations(CardSet<HoldEmRank, Suit>&, CardSet<HoldEmRank, Suit>, HoldEmGame::PlayerHand&);
+	void printPlayerHand(std::ostream&, std::vector<HoldEmGame::PlayerHand>&);
 };
 
 std::ostream& operator<<(std::ostream&, const HoldEmHandRank&);
