@@ -184,11 +184,7 @@ void PinochleGame::add_to_trick(CardSet<PinochleRank, Suit>& hand, CardSet<Pinoc
         tmp >> hand;
     }
     if(!foundCard){
-        cout << "error: getting " << Card(r,s) << "from ";
-        hand.print(cout, 8);
-        cout << "trick: ";
-        trick.print(cout, 8);
-        throw runtime_error("could not find this card");
+        throw runtime_error("Error: add_to_trick: could not find this card");
     }
 }
 
@@ -278,13 +274,10 @@ pair<PinochleRank, PinochleRank> PinochleGame::non_trump_led_play(CardSet<Pinoch
             return {highest_led_rank, highest_trump_rank};
         }
     }
-
-    cout << "hand";
-    hand.print(cout, 8);
-    cout << "trick";
-    hand.print(cout, 8);
-    cout << "trump " << trump_suit << "leading " << leading_suit << endl;
-    throw runtime_error("failed to add card to trick");
+    
+    //add lowest trump card
+    add_to_trick(hand, trick, hand_cards.front().rank, hand_cards.front().suit);
+    return {highest_led_rank, highest_trump_rank};
 }
 
 //return i, where players[i] is the first person who played the card of wanted_rank and wanted_suit
