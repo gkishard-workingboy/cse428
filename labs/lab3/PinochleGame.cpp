@@ -114,8 +114,9 @@ void PinochleGame::print_contract_result(std::ostream& os, PinochleContractTeam 
         os << "misdeal, re-dealing cards..." << std::endl;
     }
     else {
-        os << "contract went to " << to_string(team) << ", running tally: " << running_tally.at(static_cast<int>(team)) << std::endl;
+        os << "contract went to " << team_members_to_string(team) << ", running tally: " << running_tally.at(static_cast<int>(team)) << std::endl;
     }
+    os << endl;
 }
 
 std::string PinochleGame::to_string(const PinochleContractTeam& t){
@@ -203,7 +204,7 @@ PinochleRank PinochleGame::trump_led_play(CardSet<PinochleRank, Suit>& hand, Car
         if((*rit).suit == trump_suit){ //reached highest trump card in hand
             if((*rit).rank > highest_trump_rank){
                 //hand has higher trump card than any played before
-                cout << endl << 1 << endl;
+                //cout << endl << 1 << endl;
                 add_to_trick(hand, trick, (*rit).rank, trump_suit);
                 return (*rit).rank;
             }
@@ -214,7 +215,7 @@ PinochleRank PinochleGame::trump_led_play(CardSet<PinochleRank, Suit>& hand, Car
                     lowest_trump_rank = (*rit).rank;
                     ++rit;
                 }
-                cout << endl << 2 << endl;
+                //cout << endl << 2 << endl;
                 add_to_trick(hand, trick, lowest_trump_rank, trump_suit);
                 return highest_trump_rank;
             }
@@ -222,7 +223,7 @@ PinochleRank PinochleGame::trump_led_play(CardSet<PinochleRank, Suit>& hand, Car
     }
     //player does not have trump card, get lowest ranked card
     sort(hand_cards.begin(), hand_cards.end(), cardRankIsSmaller<PinochleRank, Suit>);
-    cout << endl << 3 << endl;
+    //cout << endl << 3 << endl;
     add_to_trick(hand, trick, hand_cards.front().rank, hand_cards.front().suit);
     return highest_trump_rank;
 }
@@ -237,7 +238,7 @@ pair<PinochleRank, PinochleRank> PinochleGame::non_trump_led_play(CardSet<Pinoch
     for(vector<Card<PinochleRank, Suit>>::reverse_iterator rit = hand_cards.rbegin(); rit != hand_cards.rend(); ++rit){
         if((*rit).suit == leading_suit){
             //player has leading suit card
-            if(highest_trump_rank == PinochleRank::undefined || (*rit).rank <= highest_led_rank){
+            if(highest_trump_rank != PinochleRank::undefined || (*rit).rank <= highest_led_rank){
                 //trump card was played or player's highest leading suit card is lower ranked than another leading suit card played before
                 //add lowest leading suit card
                 PinochleRank lowest_led_rank = (*rit).rank;
@@ -245,11 +246,11 @@ pair<PinochleRank, PinochleRank> PinochleGame::non_trump_led_play(CardSet<Pinoch
                     lowest_led_rank = (*rit).rank;
                     ++rit;
                 }
-                cout << endl << 4 << endl;
+                //cout << endl << 4 << endl;
                 add_to_trick(hand, trick, lowest_led_rank, leading_suit);
                 return {highest_led_rank, highest_trump_rank};
             }
-            cout << endl << 5 << endl;
+            //cout << endl << 5 << endl;
             add_to_trick(hand, trick, (*rit).rank, leading_suit);
             return {(*rit).rank, highest_trump_rank};
         }
@@ -261,7 +262,7 @@ pair<PinochleRank, PinochleRank> PinochleGame::non_trump_led_play(CardSet<Pinoch
             //player has trump card
             if(highest_trump_rank == PinochleRank::undefined || (*rit).rank > highest_trump_rank){
                 //player has higher trump card than any played before
-                cout << endl << 6 << endl;
+                //cout << endl << 6 << endl;
                 add_to_trick(hand, trick, (*rit).rank, trump_suit);
                 return {highest_led_rank, (*rit).rank};
             }
@@ -273,7 +274,7 @@ pair<PinochleRank, PinochleRank> PinochleGame::non_trump_led_play(CardSet<Pinoch
     sort(hand_cards.begin(), hand_cards.end(), cardRankIsSmaller<PinochleRank, Suit>);
     for(vector<Card<PinochleRank, Suit>>::const_iterator cit = hand_cards.cbegin(); cit != hand_cards.cend(); ++cit){
         if((*cit).suit != trump_suit){
-            cout << endl << 7 << endl;
+            //cout << endl << 7 << endl;
             add_to_trick(hand, trick, (*cit).rank, (*cit).suit);
             return {highest_led_rank, highest_trump_rank};
         }
@@ -301,15 +302,17 @@ int PinochleGame::player_with_card(CardSet<PinochleRank, Suit>& trick, vector<in
 }
 
 //returns true if the team with the contract has won the game
-bool PinochleGame::update_scores(PinochleContractTeam contract_team){
+unsigned int PinochleGame::update_scores(PinochleContractTeam contract_team){
     int teamIndex = static_cast<int>(contract_team);
     int tally = running_tally.at(teamIndex);
     pair<int,int> team_players = index_pairs.at(teamIndex);
     int total_bid = bids.at(team_players.first) + bids.at(team_players.second);
+    unsigned int score_increase = 0;
     if(tally >= total_bid){
-        scores.at(teamIndex) = scores.at(teamIndex) + total_bid;
+        score_increase = total_bid;
     }
-    return scores.at(teamIndex) >= WIN_THRESHOLD;
+    scores.at(teamIndex) = scores.at(teamIndex) + score_increase;
+    return score_increase;
 }
 
 void PinochleGame::reset_member_variables(){
@@ -323,18 +326,10 @@ void PinochleGame::reset_member_variables(){
 }
 
 //returns i, where players[i] is the winner of the trick
-int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& player_order, bool lastTrick){
-    //for testing
-                cout << "player order ";
-            for(int i : player_order){
-                cout << players.at(i) << " ";
-            }
-            cout << endl;
-    //end testing
+int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& player_order, int trick_number, bool lastTrick){
     CardSet<PinochleRank, Suit> trick;
     Card<PinochleRank, Suit> leading_card = play_leading_card(hands.at(player_order.front()), trick); // play leading card
     Suit leading_suit = leading_card.suit;
-    cout << "trump suit: " << trump_suit << " leading suit: " << leading_suit;
     int winner;
     PinochleRank winning_rank = PinochleRank::undefined;
     Suit winning_suit = Suit::undefined;
@@ -370,9 +365,6 @@ int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& play
             winning_suit = trump_suit;
         }
     }
-    cout << "cards played: ";
-    trick.print(cout, 8);
-    cout << "trick winner: " << players.at(winner) << ", who played " << Card(winning_rank, winning_suit);
 
     //update running tally if appropriate
     bool team1Wins = winner == TEAM_1_INDICES.first || winner == TEAM_1_INDICES.second;
@@ -382,7 +374,7 @@ int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& play
     if(team1GetsPoints && team2GetsPoints){
         throw runtime_error("both teams cannot win a trick");
     }
-    int additional_points;
+    unsigned int additional_points;
     if(team1GetsPoints){
         teamIndex = static_cast<int>(PinochleContractTeam::team1);
         additional_points = total_value(trick);
@@ -390,7 +382,6 @@ int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& play
             additional_points += LAST_TRICK_BONUS;
         }
         running_tally.at(teamIndex) = running_tally.at(teamIndex) + additional_points;
-        cout << "team 1 (" << players.at(TEAM_1_INDICES.first) << ", " << players.at(TEAM_1_INDICES.second) << ") got " << additional_points << " points" << endl;
     }
     if(team2GetsPoints){
         teamIndex = static_cast<int>(PinochleContractTeam::team2);
@@ -399,17 +390,58 @@ int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& play
             additional_points += LAST_TRICK_BONUS;
         }
         running_tally.at(teamIndex) = running_tally.at(teamIndex) + additional_points;
-        cout << "team 2 (" << players.at(TEAM_2_INDICES.first) << ", " << players.at(TEAM_2_INDICES.second) << ") got " << additional_points << " points" << endl;
     }
+    const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
+    vector<Card<PinochleRank, Suit>> trick_cards = trick.*pdata;
+    print_trick(cout, trick_number, leading_suit, trick_cards, player_order, winner, Card(winning_rank, winning_suit), contract_team);
 
     deck.collect(trick);
     return winner;
+}
+
+void PinochleGame::print_trick(ostream& os, int trick_number, Suit leading_suit, vector<Card<PinochleRank, Suit>>& trick_cards, 
+    vector<int>& player_order, int winner, Card<PinochleRank, Suit> winning_card, PinochleContractTeam contract_team){
+        os << "Trick #" << trick_number << endl;
+        os << "Trump suit: " << trump_suit << " Leading suit: " << leading_suit << endl;
+        os << "Cards played (in order): ";
+        for(size_t i = 0; i < player_order.size(); ++i){
+            os << players[player_order[i]] << ":" << trick_cards[i] << " ";
+        }
+        os << endl;
+        os << players[winner] << " won the trick with card " << winning_card << endl;
+        os << "Running tally for " << team_members_to_string(contract_team) << ": " << running_tally[static_cast<int>(contract_team)] << endl << endl;
+    }
+
+void PinochleGame::print_after_last_trick(ostream& os, PinochleContractTeam contract_team, unsigned int score_increase){
+    int teamIndex = static_cast<int>(contract_team);
+    pair<int,int> team_players = index_pairs.at(teamIndex);
+    int total_bid = bids.at(team_players.first) + bids.at(team_players.second);
+    os << to_string(contract_team) << "'s bid was " << total_bid << endl;
+    os << "Total Scores:" << endl;
+    os << team_members_to_string(contract_team) << ": " << scores.at(teamIndex) << " (increased by " << score_increase << " this round)" << endl;
+    PinochleContractTeam other_team = get_other_team(contract_team);
+    os << team_members_to_string(other_team) << ": " << scores.at(static_cast<int>(other_team)) << endl;
 }
 
 string PinochleGame::team_members_to_string(PinochleContractTeam t){
     int teamIndex = static_cast<int>(t);
     pair<int,int> members = index_pairs.at(teamIndex);
     return to_string(t) + " (" + players.at(members.first) + ", " + players.at(members.second) + ")";
+}
+
+PinochleContractTeam PinochleGame::get_other_team(PinochleContractTeam t){
+    if(t == PinochleContractTeam::team1){
+        return PinochleContractTeam::team2;
+    }
+    if(t == PinochleContractTeam::team2){
+        return PinochleContractTeam::team1;
+    }
+    throw runtime_error("get_other_team cannot be called on a misdeal");
+}
+
+void PinochleGame::print_game_over(ostream& os, PinochleContractTeam winning_team){
+    os << "Game over. " << endl;
+    os << "Winner: " << team_members_to_string(winning_team) << " with score " << scores.at(static_cast<int>(winning_team)) << endl;
 }
 
 int PinochleGame::play() {
@@ -437,8 +469,9 @@ int PinochleGame::play() {
             dealer = (dealer + 1) % players.size();
             vector<int> player_order;
             initialize_play_order(player_order, award_contract_result);
-            for(int i = cardsPerPlayer; i > 0; --i){
-                unsigned int winner = do_trick(award_contract_result, player_order, (i == 1)); //boolean parameter is true if players only have 1 card left
+            for(int i = 0; i < cardsPerPlayer; ++i){
+                bool lastTrick = i == (cardsPerPlayer - 1);
+                unsigned int winner = do_trick(award_contract_result, player_order, (i+1), lastTrick); //boolean parameter is true if players only have 1 card left
                 /*if(askForStop(cout, cin)){
                     return STOP;
                 }*/
@@ -451,10 +484,9 @@ int PinochleGame::play() {
                     }
                 }
             }
-
-            if(update_scores(award_contract_result)){
-                cout << "Game over. " << endl;
-                cout << "Winner: " << team_members_to_string(award_contract_result) << " with score " << scores.at(static_cast<int>(award_contract_result)) << endl;
+            print_after_last_trick(cout, award_contract_result, update_scores(award_contract_result));
+            if(scores[static_cast<int>(award_contract_result)] >= WIN_THRESHOLD){
+                print_game_over(cout, award_contract_result);
                 return STOP;
             }
             reset_member_variables();
@@ -473,6 +505,7 @@ int PinochleGame::play() {
 }
 
 void PinochleGame::print(std::ostream& os, const std::size_t rc) {
+    os << "New deal" << endl;
     size_t numPlayer = players.size();
     // print each player's status
     for (size_t i = 0; i < numPlayer; ++i) {
