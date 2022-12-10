@@ -8,9 +8,14 @@ Errors and Warnings:
 Errors:
 1. Missing declaration of HoldEmGame or HoldEmGame::PlayerHand
 It is due to the reason that the function need that type is declared before that type, so I decide to put forward the declaration of that type, but turns out that it is impossible for a nested struct to be forward declared, so I just reorder the code.
+2. "Failed to add card" 
+This was an error I had the Pinochle game throw if it tried to move a specific card from a player's hand to the trick, but could not find that card in the player's hand. I encountered this error when testing the program. It was happening because I did not consider the scenario where a player does not have a card of the non-trump suit that was led, and they do not have a higher-ranked trump card or any non-trump card. The program was trying to play a non-trump card when the player didn't have one. The error was solved by having the player play their lowest trump card in this case.
+3. bad_alloc
+I got this because I had a PinochleGame member variable that tracked each player's melds. This was a vector, and I forgot to clear the vector each time the cards were re-dealt. This error stopped happening when I made sure to clear the vector every time.
 
 Warnings:
-We meet tons of warnings, but all of them just appear as the accompany of errors, so once we fixed the error, the warning just not bother us anymore. 
+We got warnings when we tried to compare an int to an unsigned int or size_t. Since the int value was always non-negative, we solved this by making the int an unsigned int or size_t.
+There were other warnings too, but all of them just appear as the accompany of errors, so once we fixed the error, the warning just not bother us anymore. 
 
 Behavior of Executable Program:
 
