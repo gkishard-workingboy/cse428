@@ -1,8 +1,8 @@
 /*
- * @FilePath: /428cpp/labs/lab2/PinochleGame.cpp
+ * @FilePath: /428cpp/labs/lab3/PinochleGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-25 14:31:48
- * @LastEditTime: 2022-10-29 23:25:15
+ * @LastEditTime: 2022-12-09 17:28:14
  * @Description: Definition to PinochleGame.h
  *
  */
@@ -29,7 +29,7 @@ const unsigned int WIN_THRESHOLD = 1500;
 
 unsigned int PinochleGame::PinochleMeldsPointValue[PINOCHLE_NUM_ITEMS] = { 10, 20, 40, 40, 40, 60, 80, 100, 150, 300, 400, 600, 800, 1000, 1500 };
 
-PinochleGame::PinochleGame(int argc, const char* argv[]): Game(argc, argv), trump_suit(Suit::undefined){
+PinochleGame::PinochleGame(int argc, const char* argv[]) : Game(argc, argv), trump_suit(Suit::undefined) {
     // create as many hands as players in the game
     for (int i = Game::firstPlayerIndex; i < argc; ++i) {
         // will call default constructor of CardSet
@@ -49,24 +49,24 @@ void PinochleGame::deal() {
     // number of players in game
     int numHands = hands.size();
     // repeatedly shift a packet of cards to each hand of players, starting with the player right after the dealer and ending with the dealer.
-    while(!deck.isEmpty()){
-    for (int p = 1; p <= numHands && !deck.isEmpty(); ++p) {
-        // current hand
-        auto& hand = hands[(dealer + p) % numHands];
-        // shift a packet of cards
-        for (int i = 0; i < packet && !deck.isEmpty(); ++i) {
-            deck >> hand;
+    while (!deck.isEmpty()) {
+        for (int p = 1; p <= numHands && !deck.isEmpty(); ++p) {
+            // current hand
+            auto& hand = hands[(dealer + p) % numHands];
+            // shift a packet of cards
+            for (int i = 0; i < packet && !deck.isEmpty(); ++i) {
+                deck >> hand;
+            }
         }
-    }
     }
 }
 
-unsigned int PinochleGame::total_value(CardSet<PinochleRank, Suit>& cs){
+unsigned int PinochleGame::total_value(CardSet<PinochleRank, Suit>& cs) {
     const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
     std::vector<Card<PinochleRank, Suit>> cards = cs.*pdata;
     unsigned int sum = 0;
-    for(Card<PinochleRank, Suit> card: cards){
-        if(card.rank == PinochleRank::undefined){
+    for (Card<PinochleRank, Suit> card : cards) {
+        if (card.rank == PinochleRank::undefined) {
             throw std::runtime_error("Error: undefined card found in a hand");
         }
         sum += PinochleDeck::PinochleRanksPointValue[static_cast<int>(card.rank)];
@@ -74,9 +74,9 @@ unsigned int PinochleGame::total_value(CardSet<PinochleRank, Suit>& cs){
     return sum;
 }
 
-void PinochleGame::make_bid(std::vector<PinochleMelds>& melds, CardSet<PinochleRank, Suit>& hand, size_t playerIndex){
+void PinochleGame::make_bid(std::vector<PinochleMelds>& melds, CardSet<PinochleRank, Suit>& hand, size_t playerIndex) {
     unsigned int meld_value_sum = 0;
-    for(PinochleMelds meld: melds){
+    for (PinochleMelds meld : melds) {
         meld_value_sum += PinochleGame::PinochleMeldsPointValue[static_cast<int>(meld)];
     }
     total_meld_values[playerIndex] = meld_value_sum;
@@ -94,23 +94,21 @@ void PinochleGame::make_all_bids(){
 PinochleContractTeam PinochleGame::award_contract(){
     unsigned int team1_bid = bids.at(TEAM_1_INDICES.first) + bids.at(TEAM_1_INDICES.second);
     unsigned int team2_bid = bids.at(TEAM_2_INDICES.first) + bids.at(TEAM_2_INDICES.second);
-    if(team1_bid == team2_bid){
+    if (team1_bid == team2_bid) {
         return PinochleContractTeam::misdeal;
-    }
-    else if (team1_bid > team2_bid){
+    } else if (team1_bid > team2_bid) {
         int team1Index = static_cast<int>(PinochleContractTeam::team1);
         running_tally.at(team1Index) = total_meld_values.at(TEAM_1_INDICES.first) + total_meld_values.at(TEAM_1_INDICES.second);
         return PinochleContractTeam::team1;
-    }
-    else {
+    } else {
         int team2Index = static_cast<int>(PinochleContractTeam::team2);
         running_tally.at(team2Index) = total_meld_values.at(TEAM_2_INDICES.first) + total_meld_values.at(TEAM_2_INDICES.second);
         return PinochleContractTeam::team2;
     }
 }
 
-void PinochleGame::print_contract_result(std::ostream& os, PinochleContractTeam team){
-    if(team == PinochleContractTeam::misdeal){
+void PinochleGame::print_contract_result(std::ostream& os, PinochleContractTeam team) {
+    if (team == PinochleContractTeam::misdeal) {
         os << "misdeal, re-dealing cards..." << std::endl;
     }
     else {
@@ -119,8 +117,8 @@ void PinochleGame::print_contract_result(std::ostream& os, PinochleContractTeam 
     os << endl;
 }
 
-std::string PinochleGame::to_string(const PinochleContractTeam& t){
-    switch(t){
+std::string PinochleGame::to_string(const PinochleContractTeam& t) {
+    switch (t) {
         case PinochleContractTeam::team1:
             return "team 1";
         case PinochleContractTeam::team2:
@@ -220,6 +218,7 @@ PinochleRank PinochleGame::trump_led_play(CardSet<PinochleRank, Suit>& hand, Car
                 return highest_trump_rank;
             }
         }
+
     }
     //player does not have trump card, get lowest ranked card
     sort(hand_cards.begin(), hand_cards.end(), cardRankIsSmaller<PinochleRank, Suit>);
@@ -383,6 +382,7 @@ int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& play
         }
         running_tally.at(teamIndex) = running_tally.at(teamIndex) + additional_points;
     }
+
     if(team2GetsPoints){
         teamIndex = static_cast<int>(PinochleContractTeam::team2);
         additional_points = total_value(trick);
@@ -510,7 +510,7 @@ void PinochleGame::print(std::ostream& os, const std::size_t rc) {
     // print each player's status
     for (size_t i = 0; i < numPlayer; ++i) {
         os << "player name: " << players[i];
-        if(i == dealer){
+        if (i == dealer) {
             os << "*";
         }
         os << std::endl;
@@ -694,7 +694,7 @@ void PinochleGame::suit_independent_evaluation(const CardSet<PinochleRank, Suit>
     }
 }
 
-void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& cs, std::vector<PinochleMelds>& pmv, Suit passed_suit){
+void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& cs, std::vector<PinochleMelds>& pmv, Suit passed_suit) {
     // call copy constructor and make an independent copy
     CardSet<PinochleRank, Suit> csl(cs);
     // data returns a pointer to the content member fo class CardSet
@@ -715,66 +715,60 @@ void PinochleGame::suit_dependent_evaluation(const CardSet<PinochleRank, Suit>& 
     int queen_all_suits = 0; // each bit represents a suit, the bit is set to 1 if there's a queen of the given suit
     bool dix = false;
 
-     while (i < s.size()) {
-        if(s.at(i).suit == passed_suit){
+    while (i < s.size()) {
+        if (s.at(i).suit == passed_suit) {
             for (j = i; j < s.size() && s.at(j).suit == passed_suit; ++j) {
-                if(s.at(j).rank == PinochleRank::Nine){
+                if (s.at(j).rank == PinochleRank::Nine) {
                     dix = true;
-                }
-                else {
+                } else {
                     int rank_mask = 1 << (static_cast<int>(s.at(j).rank) - 1);
-                    if((run & rank_mask) > 0){
+                    if ((run & rank_mask) > 0) {
                         double_run |= rank_mask;
-                    }
-                    else {
+                    } else {
                         run |= rank_mask;
                     }
-                    if(s.at(j).rank == PinochleRank::King){
+                    if (s.at(j).rank == PinochleRank::King) {
                         king_all_suits |= passed_suit_mask;
-                    }
-                    else if(s.at(j).rank == PinochleRank::Queen){
+                    } else if (s.at(j).rank == PinochleRank::Queen) {
                         queen_all_suits |= passed_suit_mask;
                     }
                 }
             }
 
             i = j;
-        }
-        else{
+        } else {
             int current_suit_mask = 1 << static_cast<int>(s.at(i).suit);
-            if(s.at(i).rank == PinochleRank::King){
+            if (s.at(i).rank == PinochleRank::King) {
                 king_all_suits |= current_suit_mask;
             }
-            if(s.at(i).rank == PinochleRank::Queen){
+            if (s.at(i).rank == PinochleRank::Queen) {
                 queen_all_suits |= current_suit_mask;
             }
             ++i;
         }
     }
 
-    if(double_run == run_mask){
+    if (double_run == run_mask) {
         pmv.push_back(PinochleMelds::insuitdoublerun);
-    }
-    else if (run == run_mask){
+    } else if (run == run_mask) {
         pmv.push_back(PinochleMelds::insuitrun);
     }
 
     int marriage = king_all_suits & queen_all_suits;
     int mask = 1;
     int mask_end = 1 << (static_cast<int>(Suit::undefined));
-    while(mask < mask_end){
-        if((marriage & mask) == mask){
-            if(mask == passed_suit_mask){
+    while (mask < mask_end) {
+        if ((marriage & mask) == mask) {
+            if (mask == passed_suit_mask) {
                 pmv.push_back(PinochleMelds::insuitmarriage);
-            }
-            else {
+            } else {
                 pmv.push_back(PinochleMelds::offsuitmarriage);
             }
         }
         mask = mask << 1;
     }
 
-    if(dix){
+    if (dix) {
         pmv.push_back(PinochleMelds::dix);
     }
 }
