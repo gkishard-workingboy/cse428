@@ -288,9 +288,7 @@ int PinochleGame::player_with_card(CardSet<PinochleRank, Suit>& trick, vector<in
 }
 
 //returns i, where players[i] is the winner of the trick
-int PinochleGame::do_trick(PinochleContractTeam contract_team){
-    vector<int> player_order;
-    initialize_play_order(player_order, contract_team);
+int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& player_order){
     //for testing
                 cout << "player order ";
             for(int i : player_order){
@@ -309,7 +307,7 @@ int PinochleGame::do_trick(PinochleContractTeam contract_team){
         PinochleRank highest_trump_rank = leading_card.rank;
         for(size_t i = secondPlayerIndex; i < player_order.size(); ++i){
             int currentPlayer = player_order.at(i);
-            CardSet<PinochleRank, Suit> hand = hands.at(currentPlayer);
+            CardSet<PinochleRank, Suit>& hand = hands.at(currentPlayer);
             highest_trump_rank = trump_led_play(hand, trick, highest_trump_rank);
         }
         winner = player_with_card(trick, player_order, highest_trump_rank, trump_suit);
@@ -322,7 +320,7 @@ int PinochleGame::do_trick(PinochleContractTeam contract_team){
         pair<PinochleRank, PinochleRank> highest_ranks(leading_card.rank, PinochleRank::undefined);
         for(size_t i = secondPlayerIndex; i < player_order.size(); ++i){
             int currentPlayer = player_order.at(i);
-            CardSet<PinochleRank, Suit> hand = hands.at(currentPlayer);
+            CardSet<PinochleRank, Suit>& hand = hands.at(currentPlayer);
             highest_ranks = non_trump_led_play(hand, trick, highest_ranks, leading_suit);
         }
         if(highest_ranks.second == PinochleRank::undefined){
@@ -385,11 +383,27 @@ int PinochleGame::play() {
         // find who wins the contract (or if there's a misdeal). If there's no misdeal, update the dealer
         PinochleContractTeam award_contract_result = award_contract();
         print_contract_result(std::cout, award_contract_result);
+        int cardsPerPlayer = dealer_hand.size();
         if(award_contract_result != PinochleContractTeam::misdeal){
             dealer = (dealer + 1) % players.size();
-            do_trick(award_contract_result);
+            vector<int> player_order;
+            initialize_play_order(player_order, award_contract_result);
+            for(int i = cardsPerPlayer; i > 0; --i){
+                unsigned int winner = do_trick(award_contract_result, player_order);
+                /*if(askForStop(cout, cin)){
+                    return STOP;
+                }*/
+                //update player order
+                player_order.clear();
+                player_order.push_back(winner);
+                for(size_t j = 0; j < players.size(); ++j){
+                    if(j != winner){
+                        player_order.push_back(j);
+                    }
+                }
+            }
         }
-        collectAll();
+        //collectAll();
         // print a string to the standard output stream that asks the user whether or not to end the game
         if (askForStop(std::cout, std::cin)) {
             // if that string is "yes" the member function should return a value to indicate success, and otherwise it should repeat the sequence of steps
