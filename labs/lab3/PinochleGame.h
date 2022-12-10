@@ -19,6 +19,9 @@
 #include <algorithm>
 #include <string>
 
+using std::vector;
+using std::pair;
+
 const int PINOCHLE_NUM_ITEMS = 15;
 
 enum class PinochleMelds
@@ -64,15 +67,13 @@ private:
     PinochleContractTeam award_contract();
     void print_contract_result(std::ostream&, PinochleContractTeam);
     std::string to_string(const PinochleContractTeam&);
-    void add_ith_card_to_trick(CardSet<PinochleRank, Suit>& trick, CardSet<PinochleRank, Suit>& hand, int remove_index);
-    Card<PinochleRank, Suit> first_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&);
-    bool trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&);
-    void get_highest_or_lowest_in_suit(CardSet<PinochleRank, Suit>&, Suit, bool, std::vector<Card<PinochleRank, Suit>>&);
-    void add_to_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Suit, bool);
-    void add_lowest_non_trump(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Suit);
-    bool non_trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, Card<PinochleRank, Suit>&, std::vector<Card<PinochleRank, Suit>>&);
-    unsigned int play_trick(std::vector<int>&, PinochleContractTeam);
-    bool play_tricks_for_deal(PinochleContractTeam);
+    void initialize_play_order(vector<int>& player_order, PinochleContractTeam contract_team);
+    Card<PinochleRank, Suit> play_leading_card(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&);
+    void add_to_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, PinochleRank, Suit);
+    PinochleRank trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, PinochleRank);
+    pair<PinochleRank, PinochleRank> non_trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, pair<PinochleRank, PinochleRank>, Suit);
+    int do_trick(PinochleContractTeam);
+    int player_with_card(CardSet<PinochleRank, Suit>&, vector<int>&, PinochleRank, Suit);
 protected:
     PinochleDeck deck;
     // store the hands of each player in game
