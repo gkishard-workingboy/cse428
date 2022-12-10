@@ -21,6 +21,7 @@
 
 using std::vector;
 using std::pair;
+using std::string;
 
 const int PINOCHLE_NUM_ITEMS = 15;
 
@@ -60,10 +61,13 @@ private:
     std::vector<unsigned int> total_meld_values;
     std::vector<unsigned int> scores;
     std::vector<unsigned int> running_tally;
+    vector<vector<PinochleMelds>> all_melds;
     void suit_independent_evaluation(const CardSet<PinochleRank, Suit> &, std::vector<PinochleMelds> &);
     void suit_dependent_evaluation(const CardSet<PinochleRank, Suit>&, std::vector<PinochleMelds>&, Suit);
     unsigned int total_value(CardSet<PinochleRank, Suit>&);
     void make_bid(std::vector<PinochleMelds>&, CardSet<PinochleRank, Suit>&, size_t);
+    void make_all_bids();
+    void evaluate_hands();
     PinochleContractTeam award_contract();
     void print_contract_result(std::ostream&, PinochleContractTeam);
     std::string to_string(const PinochleContractTeam&);
@@ -72,8 +76,10 @@ private:
     void add_to_trick(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, PinochleRank, Suit);
     PinochleRank trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, PinochleRank);
     pair<PinochleRank, PinochleRank> non_trump_led_play(CardSet<PinochleRank, Suit>&, CardSet<PinochleRank, Suit>&, pair<PinochleRank, PinochleRank>, Suit);
-    int do_trick(PinochleContractTeam, vector<int>&);
+    int do_trick(PinochleContractTeam, vector<int>&, bool);
     int player_with_card(CardSet<PinochleRank, Suit>&, vector<int>&, PinochleRank, Suit);
+    bool update_scores(PinochleContractTeam contract_team);
+    string team_members_to_string(PinochleContractTeam);
 protected:
     PinochleDeck deck;
     // store the hands of each player in game
