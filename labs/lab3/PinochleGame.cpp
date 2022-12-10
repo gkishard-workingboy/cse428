@@ -37,6 +37,8 @@ PinochleGame::PinochleGame(int argc, const char* argv[]): Game(argc, argv), trum
         bids.push_back(0);
         total_meld_values.push_back(0);
         scores.push_back(0);
+    }
+    for(size_t j = 0; j < index_pairs.size(); ++j){
         running_tally.push_back(0);
     }
 }
@@ -81,6 +83,12 @@ void PinochleGame::make_bid(std::vector<PinochleMelds>& melds, CardSet<PinochleR
 
     unsigned int bid = meld_value_sum + total_value(hand);
     bids[playerIndex] = bid;
+}
+
+void PinochleGame::make_all_bids(){
+    for(size_t i = 0; i < all_melds.size(); ++i){
+        make_bid(all_melds[i], hands[i], i);
+    }
 }
 
 PinochleContractTeam PinochleGame::award_contract(){
@@ -271,6 +279,11 @@ pair<PinochleRank, PinochleRank> PinochleGame::non_trump_led_play(CardSet<Pinoch
         }
     }
 
+    cout << "hand";
+    hand.print(cout, 8);
+    cout << "trick";
+    hand.print(cout, 8);
+    cout << "trump " << trump_suit << "leading " << leading_suit << endl;
     throw runtime_error("failed to add card to trick");
 }
 
@@ -287,8 +300,20 @@ int PinochleGame::player_with_card(CardSet<PinochleRank, Suit>& trick, vector<in
     throw runtime_error("trick does not have a card of wanted_rank and wanted_suit");
 }
 
+//returns true if the team with the contract has won the game
+bool PinochleGame::update_scores(PinochleContractTeam contract_team){
+    int teamIndex = static_cast<int>(contract_team);
+    int tally = running_tally.at(teamIndex);
+    pair<int,int> team_players = index_pairs.at(teamIndex);
+    int total_bid = bids.at(team_players.first) + bids.at(team_players.second);
+    if(tally >= total_bid){
+        scores.at(teamIndex) = scores.at(teamIndex) + total_bid;
+    }
+    return scores.at(teamIndex) >= WIN_THRESHOLD;
+}
+
 //returns i, where players[i] is the winner of the trick
-int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& player_order){
+int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& player_order, bool lastTrick){
     //for testing
                 cout << "player order ";
             for(int i : player_order){
@@ -351,18 +376,30 @@ int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& play
     if(team1GetsPoints){
         teamIndex = static_cast<int>(PinochleContractTeam::team1);
         additional_points = total_value(trick);
+        if(lastTrick){
+            additional_points += LAST_TRICK_BONUS;
+        }
         running_tally.at(teamIndex) = running_tally.at(teamIndex) + additional_points;
         cout << "team 1 (" << players.at(TEAM_1_INDICES.first) << ", " << players.at(TEAM_1_INDICES.second) << ") got " << additional_points << " points" << endl;
     }
     if(team2GetsPoints){
         teamIndex = static_cast<int>(PinochleContractTeam::team2);
         additional_points = total_value(trick);
+        if(lastTrick){
+            additional_points += LAST_TRICK_BONUS;
+        }
         running_tally.at(teamIndex) = running_tally.at(teamIndex) + additional_points;
         cout << "team 2 (" << players.at(TEAM_2_INDICES.first) << ", " << players.at(TEAM_2_INDICES.second) << ") got " << additional_points << " points" << endl;
     }
 
     deck.collect(trick);
     return winner;
+}
+
+string PinochleGame::team_members_to_string(PinochleContractTeam t){
+    int teamIndex = static_cast<int>(t);
+    pair<int,int> members = index_pairs.at(teamIndex);
+    return to_string(t) + " (" + players.at(members.first) + ", " + players.at(members.second) + ")";
 }
 
 int PinochleGame::play() {
@@ -378,9 +415,11 @@ int PinochleGame::play() {
         const std::vector<Card<PinochleRank, Suit>> CardSet<PinochleRank, Suit>::* pdata = CardSet<PinochleRank, Suit>::data();
         auto dealer_hand = hands.at(dealer).*pdata;
         trump_suit = dealer_hand.back().suit;
+        evaluate_hands();
         // print out each player's name and then the cards in their hand to the standard output stream
         print(std::cout, CardsInRow);
         // find who wins the contract (or if there's a misdeal). If there's no misdeal, update the dealer
+        make_all_bids();
         PinochleContractTeam award_contract_result = award_contract();
         print_contract_result(std::cout, award_contract_result);
         int cardsPerPlayer = dealer_hand.size();
@@ -389,7 +428,7 @@ int PinochleGame::play() {
             vector<int> player_order;
             initialize_play_order(player_order, award_contract_result);
             for(int i = cardsPerPlayer; i > 0; --i){
-                unsigned int winner = do_trick(award_contract_result, player_order);
+                unsigned int winner = do_trick(award_contract_result, player_order, (i == 1)); //boolean parameter is true if players only have 1 card left
                 /*if(askForStop(cout, cin)){
                     return STOP;
                 }*/
@@ -402,8 +441,23 @@ int PinochleGame::play() {
                     }
                 }
             }
+
+            if(update_scores(award_contract_result)){
+                cout << "Game over. " << endl;
+                cout << "Winner: " << team_members_to_string(award_contract_result) << " with score " << scores.at(static_cast<int>(award_contract_result)) << endl;
+                return STOP;
+            }
+            int team1Index = static_cast<int>(PinochleContractTeam::team1);
+            int team2Index = static_cast<int>(PinochleContractTeam::team2);
+            bids[team1Index] = 0;
+            bids[team2Index] = 0;
+            running_tally[team1Index] = 0;
+            running_tally[team2Index] = 0;
+            all_melds.clear();
         }
-        //collectAll();
+        else {
+            collectAll();
+        }
         // print a string to the standard output stream that asks the user whether or not to end the game
         if (askForStop(std::cout, std::cin)) {
             // if that string is "yes" the member function should return a value to indicate success, and otherwise it should repeat the sequence of steps
@@ -423,15 +477,21 @@ void PinochleGame::print(std::ostream& os, const std::size_t rc) {
         }
         os << std::endl;
         hands[i].print(os, rc);
-        // for each hand initiate a vector and call suit_independent_evaluation to print scores
-        std::vector<PinochleMelds> melds;
-        suit_independent_evaluation(hands[i], melds);
-        suit_dependent_evaluation(hands[i], melds, trump_suit);
         os << "Melds:";
+        vector<PinochleMelds>& melds = all_melds[i];
         for (auto meld : melds)
             os << "  " << meld;
         os << std::endl;
-        make_bid(melds, hands[i], i);
+    }
+}
+
+void PinochleGame::evaluate_hands(){
+    size_t numPlayer = players.size();
+    for (size_t i = 0; i < numPlayer; ++i) {
+        vector<PinochleMelds> melds;
+        suit_independent_evaluation(hands[i], melds);
+        suit_dependent_evaluation(hands[i], melds, trump_suit);
+        all_melds.push_back(melds);
     }
 }
 
