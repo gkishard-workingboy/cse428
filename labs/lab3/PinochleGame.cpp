@@ -312,6 +312,16 @@ bool PinochleGame::update_scores(PinochleContractTeam contract_team){
     return scores.at(teamIndex) >= WIN_THRESHOLD;
 }
 
+void PinochleGame::reset_member_variables(){
+    int team1Index = static_cast<int>(PinochleContractTeam::team1);
+    int team2Index = static_cast<int>(PinochleContractTeam::team2);
+    bids[team1Index] = 0;
+    bids[team2Index] = 0;
+    running_tally[team1Index] = 0;
+    running_tally[team2Index] = 0;
+    all_melds.clear();
+}
+
 //returns i, where players[i] is the winner of the trick
 int PinochleGame::do_trick(PinochleContractTeam contract_team, vector<int>& player_order, bool lastTrick){
     //for testing
@@ -447,16 +457,11 @@ int PinochleGame::play() {
                 cout << "Winner: " << team_members_to_string(award_contract_result) << " with score " << scores.at(static_cast<int>(award_contract_result)) << endl;
                 return STOP;
             }
-            int team1Index = static_cast<int>(PinochleContractTeam::team1);
-            int team2Index = static_cast<int>(PinochleContractTeam::team2);
-            bids[team1Index] = 0;
-            bids[team2Index] = 0;
-            running_tally[team1Index] = 0;
-            running_tally[team2Index] = 0;
-            all_melds.clear();
+            reset_member_variables();
         }
         else {
             collectAll();
+            reset_member_variables();
         }
         // print a string to the standard output stream that asks the user whether or not to end the game
         if (askForStop(std::cout, std::cin)) {
