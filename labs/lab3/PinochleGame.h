@@ -80,6 +80,7 @@ private:
     int player_with_card(CardSet<PinochleRank, Suit>&, vector<int>&, PinochleRank, Suit);
     bool update_scores(PinochleContractTeam contract_team);
     string team_members_to_string(PinochleContractTeam);
+    void reset_member_variables();
 protected:
     PinochleDeck deck;
     // store the hands of each player in game
