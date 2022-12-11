@@ -76,8 +76,10 @@ protected:
 	std::vector<std::string> playerRank;
 
 	virtual void deal();
-	void bet();
-	std::vector<HoldEmAction> action(const CardSet<HoldEmRank, Suit>&);
+	void reset();
+	bool bet();
+	std::vector<HoldEmAction> action_before_turn(const CardSet<HoldEmRank, Suit>&);
+	std::vector<HoldEmAction> action_after_turn(const HoldEmGame::PlayerHand&);
 	// * DESIGN:
 	// * modularize play() by extract parts to 2 member methods
 	void collectAll();
