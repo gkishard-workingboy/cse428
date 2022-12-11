@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-11 00:56:09
+ * @LastEditTime: 2022-12-11 01:07:45
  * @Description: Definition to HoldEmGame.h
  *
  */
@@ -32,6 +32,8 @@ HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv), state(H
         this->input_scores.push_back(0);
         this->playerStatus.push_back(true);
     }
+    // new game, new scores
+    fill(scores.begin(), scores.end(), BEGIN_SCORE);
     combinations.push_back({ 0 });
     for (int i = 0; i < HANDCARD_NUM; ++i) {
         vector<int>& prev = combinations[i], tmp;
@@ -450,10 +452,11 @@ int HoldEmGame::play() {
 
     bool isGameEnd = false;
     bool foldRound = true;
-    // new game, new scores
-    fill(scores.begin(), scores.end(), BEGIN_SCORE);
 
     while (!isGameEnd) {
+        // reset foldRound
+        foldRound = true;
+
         // shuffle card set state to preflop
         deck.shuffle();
         // reset in-game player's status
@@ -524,9 +527,9 @@ int HoldEmGame::play() {
         if (!foldRound)
             settleRound(phs);
 
-        // if (askForStop(cout, cin)) {
-        //     return STOP;
-        // }
+        if (askForStop(cout, cin)) {
+            return STOP;
+        }
 
         // if only one player left after this round, the winner comes out and game ends.
         if (players.size() == 1) {
