@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-10 23:57:08
+ * @LastEditTime: 2022-12-11 01:51:18
  * @Description: Declaration for Hold'Em Game states and class.
  *
  */

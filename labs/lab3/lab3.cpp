@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/lab3.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-24 21:48:13
- * @LastEditTime: 2022-12-09 10:47:50
+ * @LastEditTime: 2022-12-11 01:41:03
  * @Description: This file contains the main function for testing
  * the functionality of two kinds of decks.
  */
@@ -46,7 +46,7 @@ shared_ptr<Game> create(int argc, const char* argv[]) {
 }
 
 int usage(ResultCode rc) {
-    cout << "Usage: ./lab2.out <Game> <Player Names>" << endl;
+    cout << "Usage: ./lab3.out <Game> <Player Names>" << endl;
     cout << "Game should be either 'Pinochle' or 'HoldEm'." << endl;
     if (rc != ResultCode::UsageHoldEmPlayerNumError) {
         cout << "If the game is Pinochle, there must be 4 player names." << endl;

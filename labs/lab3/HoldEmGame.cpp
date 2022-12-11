@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-11 01:07:45
+ * @LastEditTime: 2022-12-11 01:52:49
  * @Description: Definition to HoldEmGame.h
  *
  */
@@ -552,6 +552,8 @@ HoldEmGame::PlayerHand& HoldEmGame::PlayerHand::operator=(const HoldEmGame::Play
 }
 
 bool operator<(const HoldEmGame::PlayerHand& lhs, const HoldEmGame::PlayerHand& rhs) {
+    if (lhs.rank == HoldEmHandRank::undefined) return true;
+    if (rhs.rank == HoldEmHandRank::undefined) return false;
     // if rank is same, goes into complex logic
     if (lhs.rank == rhs.rank) {
         if (lhs.cards.isEmpty()) {
