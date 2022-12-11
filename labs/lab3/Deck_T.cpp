@@ -1,15 +1,14 @@
 /*
- * @FilePath: /428cpp/labs/lab1/Deck_T.cpp
+ * @FilePath: /428cpp/labs/lab3/Deck_T.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-09-25 11:12:00
- * @LastEditTime: 2022-09-25 16:03:41
+ * @LastEditTime: 2022-12-11 00:48:58
  * @Description: Defition of Deck_T.h
  *
  */
 
 template <typename R, typename S>
-void Deck<R, S>::shuffle()
-{
+void Deck<R, S>::shuffle() {
     // uniformly reorder the cards
     std::random_device rd;
     std::mt19937 g(rd());
@@ -17,11 +16,9 @@ void Deck<R, S>::shuffle()
 }
 
 template <typename R, typename S>
-void Deck<R, S>::collect(CardSet<R, S> &cardset)
-{
+void Deck<R, S>::collect(CardSet<R, S>& cardset) {
     // check cardset is not empty
-    while (!cardset.isEmpty())
-    {
+    while (!cardset.isEmpty()) {
         // push last card from cardset to current object
         // * no risk for throwing exception
         cardset >> *this;

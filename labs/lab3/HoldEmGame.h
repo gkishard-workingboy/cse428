@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-10 20:46:26
+ * @LastEditTime: 2022-12-10 23:57:08
  * @Description: Declaration for Hold'Em Game states and class.
  *
  */
@@ -67,6 +67,7 @@ private:
 
 protected:
 	int pot;
+	unsigned int lastRaisedPlayer;
 	HoldEmState state;
 	HoldEmDeck deck;
 	std::vector<CardSet<HoldEmRank, Suit>> hands;

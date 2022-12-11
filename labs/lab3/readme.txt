@@ -201,3 +201,31 @@ BOARD (turn): JS 10C 7H 5H
 BOARD (river): JS 10C 7H 5H JH 
 
 >>> Would you like to end the current game? (yes/*) 
+
+
+And I also catch a really interesting case in our HoldEm Game:
+
+player name: A
+9S 5H 
+player name: C*
+JS 8D 
+player name: D
+QS AC 
+player name: E
+7S 9D 
+ pot starts with 0 chips
+Player A has 122 chips
+Player A folds 
+Player A leaves 122 chips 
+Player C has 57 chips
+Player C folds 
+Player C leaves 57 chips 
+Player D has 62 chips
+Player D folds 
+player E wins with 3 chips
+Player A won 0 chips
+Player C won 3 chips
+Player D won 0 chips
+Player E won 0 chips
+
+Due to the rule that only the ealier player will win the remainder at tie game, and here we have a pot less than the number of player in tie. So only Player C won all the chips.
