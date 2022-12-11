@@ -22,6 +22,8 @@ const int minimum_value_bet_after_turn = 4;
 const int big_blind_default_bet_value = 2;
 const int small_blind_default_bet_value = 1;
 const int a_large_number_larger_than_initial_score_size = 1000;
+const int consecutive_four = 4;
+
 
 
 HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv), state(HoldEmState::preflop) {
@@ -107,7 +109,7 @@ vector<HoldEmAction> HoldEmGame::action_after_turn(const HoldEmGame::PlayerHand&
             vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::call };
             return result;
         }
-        else if (playerHands.rank == HoldEmHandRank::pair) {   //four consecutive cards WIP
+        else if (playerHands.rank == HoldEmHandRank::pair || eval_four(playerHands.cards) == true) {   //four consecutive cards WIP
             vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
             return result;
         }
@@ -125,7 +127,7 @@ vector<HoldEmAction> HoldEmGame::action_after_turn(const HoldEmGame::PlayerHand&
             vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::call };
             return result;
         }
-        else if (playerHands.rank == HoldEmHandRank::twopair || playerHands.rank == HoldEmHandRank::pair) {   //four consecutive cards WIP
+        else if (playerHands.rank == HoldEmHandRank::twopair || playerHands.rank == HoldEmHandRank::pair || eval_four(playerHands.cards) == true) {   //four consecutive cards WIP
             vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
             return result;
         }
@@ -177,7 +179,7 @@ bool HoldEmGame::bet() {
             scores[big_blind] -= big_blind_default_bet_value;
             input_scores[small_blind] += small_blind_default_bet_value;
             input_scores[big_blind] += big_blind_default_bet_value;
-            pot = small_blind_default_bet_value+ big_blind_default_bet_value;
+            pot = small_blind_default_bet_value + big_blind_default_bet_value;
         }
 
         long unsigned int totalPass = 0;
@@ -217,7 +219,7 @@ bool HoldEmGame::bet() {
             if (playerAction == HoldEmAction::fold) {
                 foldCount++;
                 playerStatus[i] = false;
-                cout << "Player " << i << " folded." << foldCount << " " << players.size() << endl;
+                cout << "Player " << i << " folded." << endl;
                 if (foldCount == (players.size() - 1)) {  //if all other than 1 player folded, end the game.                    
                     for (size_t j = 0; j < players.size(); ++j) {
                         if (playerStatus[j] == true) {
@@ -559,6 +561,32 @@ int HoldEmGame::play() {
 
         dealer = (dealer + 1) % players.size();
     }
+}
+
+bool HoldEmGame::eval_four(const CardSet<HoldEmRank, Suit>& cs) {
+    CardSet<HoldEmRank, Suit> hand(cs);
+    vector<Card<HoldEmRank, Suit>> CardSet<HoldEmRank, Suit>::* pdata = CardSet<HoldEmRank, Suit>::data();
+    vector<Card<HoldEmRank, Suit>>& cards = hand.*pdata;
+
+    sort(cards.begin(), cards.end(), cardRankIsSmaller<HoldEmRank, Suit>);
+    for (auto i : cards)
+        std::cout << i << ' ';
+    reverse(cards.begin(), cards.end());
+    for (size_t i = 0; i < (cards.size() - consecutive_four + 1); i++) {
+        int consecutive_count = 0;
+        for (size_t j = 0; j < consecutive_four; j++) {
+            if ((static_cast<int>(cards[j].rank) < static_cast<int>(cards[j + 1].rank)) && (cards[j + 1].rank != HoldEmRank::Ace)) {
+                consecutive_count++;
+            }
+            else {
+                break;
+            }
+        }
+        if (consecutive_count == consecutive_four) {
+            return true;
+        }
+    }
+    return false;
 }
 
 HoldEmGame::PlayerHand::PlayerHand(CardSet<HoldEmRank, Suit>& cardset, int playername, HoldEmHandRank hhr) : cards(cardset), name(playername), rank(hhr) { }

@@ -88,6 +88,7 @@ protected:
 	void evalCombinations(CardSet<HoldEmRank, Suit>&, CardSet<HoldEmRank, Suit>, HoldEmGame::PlayerHand&);
 	void printPlayerHand(std::ostream&, std::vector<HoldEmGame::PlayerHand>&);
 	std::vector<HoldEmGame::PlayerHand> phs;
+	bool eval_four(const CardSet<HoldEmRank, Suit>&);
 };
 
 std::ostream& operator<<(std::ostream&, const HoldEmHandRank&);
