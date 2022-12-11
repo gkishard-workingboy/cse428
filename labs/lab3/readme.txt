@@ -143,8 +143,28 @@ team 2 (p2, p4): 0
 
 >>> Do you wish to stop playing? (yes/*) 
 
-Typing "yes" here will end the game, but typing anything else will start a new deal. We repeated the deal several times. Each time the cards were generated, the players' hands are listed in the order that the user specified in the command. Each player's melds are identified correctly and completly. In the output above, p1 and p2 were correctly identified to have pinochle since they each have one pair of JD and QS cards.
-And cards are palyed correctly in each trick, and the winner of each trick is identified correctly and scoring will be tallied accurately in each trick. The result of trick is correctly conducted by comparing bid and running tally.
+Typing "yes" here will end the game, but typing anything else will start a new deal. We repeated the deal several times. Each time the cards were generated, the players' hands are listed in the order that the user specified in the command. Each player's melds are identified correctly and completly. 
+And cards are played correctly in each trick, and the winner of each trick is identified correctly and scoring will be tallied accurately in each trick. The result of trick is correctly conducted by comparing bid and running tally.
+
+If there was a misdeal, the tricks will not be played. The game will print a message saying there was a misdeal and re-deal the cards if the user continues playing. For example:
+New deal
+player name: p1
+KD JD 10H 10S AH QH JS 9S 
+JC QD QC 9S 
+Melds:  insuitmarriage 40
+player name: p2
+9D KS AS AC AS KC KC 10D 
+AD KS KH 9C 
+Melds:  dix 10
+player name: p3
+10H AH JH QH 10C QS 9C JH 
+KD 10D QS JC 
+Melds:
+player name: p4*
+QC 10C 9H 9D 9H QD AD JS 
+10S AC KH JD 
+Melds:  dix 10
+misdeal, re-dealing cards...
 
 Here are some additional examples of outputs we got when playing:
 
@@ -244,6 +264,10 @@ team 2's bid was 212
 Total Scores:
 team 2 (p2, p4): 212 (increased by 212 this round)
 team 1 (p1, p3): 0
+
+When a team's score equals or exceeds 1500, the game ends and prints a message saying that team won. Here's an example message:
+Game over. 
+Winner: team 2 (p2, p4) with score 1835
 
 The HoldEm game also works as expected. The command "./lab3.out HoldEm p1 p2 p3" yields the following output:
 
