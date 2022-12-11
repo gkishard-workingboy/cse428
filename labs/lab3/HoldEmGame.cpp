@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-10 21:36:41
+ * @LastEditTime: 2022-12-10 22:57:50
  * @Description: Definition to HoldEmGame.h
  *
  */
@@ -13,6 +13,7 @@ const int HANDCARD_NUM = 2;
 const int LENGTH_OF_PAIR = 2;
 const int LENGTH_OF_THREE = 3;
 const int LENGTH_OF_FOUR = 4;
+const int BEGIN_SCORE = 60;
 // standard number of cards in hand for evaluation
 const int STD_HAND_NUM = 5;
 const int ACE_OFFSET = 1;
@@ -23,14 +24,23 @@ const int big_blind_default_bet_value = 2;
 const int small_blind_default_bet_value = 1;
 
 
-HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv), state(HoldEmState::preflop) {
+HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv), state(HoldEmState::preflop), combinations() {
     // create as many hands as players in the game
     for (int i = Game::firstPlayerIndex; i < argc; ++i) {
         // will call default constructor of CardSet
         hands.emplace_back();
-        this->scores.push_back(60);
         this->input_scores.push_back(0);
         this->playerStatus.push_back(true);
+    }
+    combinations.push_back({ 0 });
+    for (int i = 0; i < HANDCARD_NUM; ++i) {
+        vector<int>& prev = combinations[i], tmp;
+        for (int prevCombo : prev) {
+            for (int j = i + STD_HAND_NUM - 1; ((1 << j) & prevCombo) == 0 && j >= 0; --j) {
+                tmp.push_back((1 << j) | prevCombo);
+            }
+        }
+        combinations.push_back(tmp);
     }
 }
 
@@ -158,6 +168,8 @@ bool HoldEmGame::bet() {
     while (!isRoundOver) {
         foldCount = 0;
         std::fill(input_scores.begin(), input_scores.end(), 0);
+        unsigned int largest_bet = 0; // largest value for call/raise check max value
+        unsigned int totalPass = 0;
         if (this->state == HoldEmState::flop) {
             size_t small_blind = (small_blind_default_bet_value + dealer) % players.size();
             size_t big_blind = (big_blind_default_bet_value + dealer) % players.size();
@@ -166,16 +178,16 @@ bool HoldEmGame::bet() {
             input_scores[small_blind] += small_blind_default_bet_value;
             input_scores[big_blind] += big_blind_default_bet_value;
             pot = small_blind_default_bet_value + big_blind_default_bet_value;
+            largest_bet = big_blind_default_bet_value;
         }
 
-        long unsigned int totalPass = 0;
-        unsigned int largest_bet = 0; // largest value for call/raise check max value
-        for (size_t k = 0; k < players.size(); ++k) {
+        for (size_t k = 1; k <= players.size(); ++k) {
             size_t i = (startPlayer + k) % players.size();
-            if (playerStatus[i] == false || input_scores[i] == largest_bet || scores[i] == 0) //will pass if conditions satisfy
+            cout << "Player " << i << " turn";
+            cout << " status " << playerStatus[i] << " scores " << scores[i] << endl;
+            if (!playerStatus[i] || scores[i] == 0 || (k == players.size() && state == HoldEmState::flop)) //will pass if conditions satisfy
                 continue;
 
-            cout << "Player " << i << " turn" << endl;
             //part 15, get specific move based on hands
             vector<HoldEmAction> handAction;
             if (this->state == HoldEmState::flop) {
@@ -197,6 +209,16 @@ bool HoldEmGame::bet() {
                 foldCount++;
                 playerStatus[i] = false;
                 cout << "Player " << i << " folded " << endl;
+                //check if all other players fold the card already.
+                if (foldCount == (players.size() - 1)) {  //if all other than 1 player folded, end the game.                    
+                    for (size_t j = 0; j < players.size(); ++j) {
+                        if (playerStatus[j] == true) {
+                            scores[j] += pot;
+                            cout << "player " << players[j] << " win this pot with " << pot << " scores" << endl;
+                        }
+                    }
+                    return true;
+                }
             } else if (playerAction == HoldEmAction::call) {    //make action to call
                 if (scores[i] <= largest_bet) {
                     pot += scores[i];
@@ -211,22 +233,23 @@ bool HoldEmGame::bet() {
                 cout << "Player " << i << " left with " << scores[i] << endl;
             } else if (playerAction == HoldEmAction::raise) {         //make action to raise
                 raiseFlag = true;
-                if (scores[i] <= largest_bet) {
+                unsigned int betInput = largest_bet + min_raise_value - input_scores[i];
+                if (scores[i] <= betInput) {
                     cout << "Player " << i << " opted to ALL-IN" << endl;
                     pot += scores[i];
                     input_scores[i] = scores[i];
+                    largest_bet = max(largest_bet, scores[i]);
                     scores[i] = 0;
                 } else {
-                    unsigned int betInput = min_raise_value;
                     scores[i] -= betInput;
                     pot = pot + betInput;
                     input_scores[i] += betInput;
-                    largest_bet += betInput;
+                    largest_bet = input_scores[i];
                     cout << "Player " << i << " successfully bet " << betInput << endl;
                 }
             }
+            cout << "Player " << i << " over" << endl;
         }
-
         //check if all other players fold the card already.
         if (foldCount == (players.size() - 1)) {  //if all other than 1 player folded, end the game.                    
             for (size_t j = 0; j < players.size(); ++j) {
@@ -237,21 +260,24 @@ bool HoldEmGame::bet() {
             }
             return true;
         }
-
         // check if can end the loop
         for (size_t i = 0; i < players.size(); ++i) {
-            if (playerStatus[i] == false || input_scores[i] == largest_bet || (input_scores[i] != largest_bet && input_scores[i] != 0 && scores[i] == 0))
+            if (playerStatus[i] == false || input_scores[i] == largest_bet || scores[i] == 0)
                 totalPass++;
         }
-        if (totalPass == players.size())
-            isRoundOver = false;
+        cout << largest_bet << " " << totalPass << endl;
+        if (totalPass == players.size()) {
+            cout << "should quit" << endl;
+            isRoundOver = true;
+        }
     }
+
     return false;
 }
 
 void HoldEmGame::resetAllPlayerStatus() {
-    playerStatus.resize(players.size(), true);
-    input_scores.resize(players.size(), 0);
+    fill(playerStatus.begin(), playerStatus.end(), true);
+    fill(input_scores.begin(), input_scores.end(), 0);
 }
 
 void HoldEmGame::collectAll() {
@@ -305,27 +331,8 @@ void HoldEmGame::evalCombinations(CardSet<HoldEmRank, Suit>& handCards, CardSet<
     // put all rest cards into a vector
     std::vector<Card<HoldEmRank, Suit>> restCards = boardVec;
     restCards.insert(restCards.end(), handVec.begin(), handVec.end());
-    // index of last element of restCards
-    int lastPos = restCards.size() - 1;
 
-    // only compute once the combinations array
-    if (static_cast<int>(combinations.size()) <= missed) {
-        for (int i = combinations.size(); i <= missed; ++i) {
-            vector<int> tmp;
-            if (combinations.empty()) {
-                tmp.push_back(0);
-                // always keep last position in consideration, so minus one
-            } else {
-                vector<int>& combos = combinations.back();
-                for (int prevCombo : combos) {
-                    for (int j = lastPos; ((1 << j) & prevCombo) == 0; --j) {
-                        tmp.push_back((1 << j) | prevCombo);
-                    }
-                }
-            }
-            combinations.push_back(std::move(tmp));
-        }
-    }
+    cout << " start evaluate player " << players[playerHand.name] << endl;
 
     vector<int>& combos = combinations[missed];
     // evaluate every possible combinations.
@@ -348,7 +355,7 @@ void HoldEmGame::printPlayerHand(std::ostream& os, std::vector<HoldEmGame::Playe
     sort(playerHands.begin(), playerHands.end());
     reverse(playerHands.begin(), playerHands.end());
     for (auto& [cst, nid, rank] : playerHands) {
-        if (playerStatus[nid] == true) {
+        if (playerStatus[nid]) {
             os << "Player: " << players[nid] << endl;
             cst.print(cout, boardWidth);
             os << "Hand rank: " << rank << endl;
@@ -450,9 +457,15 @@ int HoldEmGame::play() {
     const int STOP = 0;
     const int boardWidth = 5;
 
+    for (auto i : scores) cout << i << " ";
+    cout << endl;
+
     while (true) {
         bool isGameEnd = false;
         bool foldRound = true;
+        // new game, new scores
+        fill(scores.begin(), scores.end(), BEGIN_SCORE);
+
         while (!isGameEnd) {
             // shuffle card set state to preflop
             deck.shuffle();
@@ -501,7 +514,6 @@ int HoldEmGame::play() {
                     board.print(cout, boardWidth);
 
                     for (size_t i = 0; i < phs.size(); ++i) {
-                        if (!playerStatus[i]) continue;
                         evalCombinations(hands[phs[i].name], board, phs[i]);
                     }
                     printPlayerHand(cout, phs);
@@ -513,7 +525,6 @@ int HoldEmGame::play() {
                         board.print(cout, boardWidth);
 
                         for (size_t i = 0; i < phs.size(); ++i) {
-                            if (!playerStatus[i]) continue;
                             evalCombinations(hands[phs[i].name], board, phs[i]);
                         }
                         printPlayerHand(cout, phs);
