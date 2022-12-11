@@ -46,7 +46,7 @@ enum class HoldEmAction {
 	raise
 };
 
-class HoldEmGame: public Game {
+class HoldEmGame : public Game {
 public:
 	HoldEmGame(int, const char* []);
 	virtual int play() override;
@@ -76,8 +76,10 @@ protected:
 	std::vector<bool> playerStatus;
 
 	virtual void deal();
-	void bet();
-	std::vector<HoldEmAction> action(const CardSet<HoldEmRank, Suit>&);
+	void reset();
+	bool bet();
+	std::vector<HoldEmAction> action_before_turn(const CardSet<HoldEmRank, Suit>&);
+	std::vector<HoldEmAction> action_after_turn(const HoldEmGame::PlayerHand&);
 	// * DESIGN:
 	// * modularize play() by extract parts to 2 member methods
 	void collectAll();
@@ -85,6 +87,7 @@ protected:
 	bool askForStop(std::ostream&, std::istream&);
 	void evalCombinations(CardSet<HoldEmRank, Suit>&, CardSet<HoldEmRank, Suit>, HoldEmGame::PlayerHand&);
 	void printPlayerHand(std::ostream&, std::vector<HoldEmGame::PlayerHand>&);
+	std::vector<HoldEmGame::PlayerHand> phs;
 };
 
 std::ostream& operator<<(std::ostream&, const HoldEmHandRank&);

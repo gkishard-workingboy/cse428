@@ -18,12 +18,14 @@ const int STD_HAND_NUM = 5;
 const int ACE_OFFSET = 1;
 const int ACE_LOW = 0;
 
-HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv), state(HoldEmState::preflop), input_scores(players.size(), 0), playerStatus(players.size(), true), pot(0) {
+HoldEmGame::HoldEmGame(int argc, const char* argv[]) : Game(argc, argv), state(HoldEmState::preflop) {
     // create as many hands as players in the game
     for (int i = Game::firstPlayerIndex; i < argc; ++i) {
         // will call default constructor of CardSet
         hands.emplace_back();
         this->scores.push_back(60);
+        this->input_scores.push_back(0);
+        this->playerStatus.push_back(true);
     }
 }
 
@@ -38,93 +40,196 @@ void HoldEmGame::deal() {
             }
         }
         this->state = HoldEmState::flop;
-    } else if (this->state == HoldEmState::flop) {
+    }
+    else if (this->state == HoldEmState::flop) {
         for (size_t i = 0; i < flopCards; i++) {
             deck >> board;
         }
         this->state = HoldEmState::turn;
-    } else if (this->state == HoldEmState::turn) {
+    }
+    else if (this->state == HoldEmState::turn) {
         deck >> board;
         this->state = HoldEmState::river;
-    } else if (this->state == HoldEmState::river) {
+    }
+    else if (this->state == HoldEmState::river) {
         deck >> board;
         this->state = HoldEmState::undefined;
     }
     // do nothing for other states
 }
 
-vector<HoldEmAction> HoldEmGame::action(const CardSet<HoldEmRank, Suit>& cs) {
-    /*if (this->state == HoldEmState::flop) {
-    }*/
-
+vector<HoldEmAction> HoldEmGame::action_before_turn(const CardSet<HoldEmRank, Suit>& cs) {
     CardSet<HoldEmRank, Suit> hand(cs);
     vector<Card<HoldEmRank, Suit>> CardSet<HoldEmRank, Suit>::* pdata = CardSet<HoldEmRank, Suit>::data();
     vector<Card<HoldEmRank, Suit>>& cards = hand.*pdata;
     if (cards[0].rank == cards[1].rank && cards[0].rank == HoldEmRank::Ace) {
         vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::raise };
         return result;
-    } else if (cards[0].rank == cards[1].rank && ((cards[0].rank == HoldEmRank::King) || (cards[0].rank == HoldEmRank::Queen) || (cards[0].rank == HoldEmRank::Jack))) {
+    }
+    else if (cards[0].rank == cards[1].rank && ((cards[0].rank == HoldEmRank::King) || (cards[0].rank == HoldEmRank::Queen) || (cards[0].rank == HoldEmRank::Jack))) {
         vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::call };
         return result;
-    } else if (cards[0].suit == cards[1].suit) {
+    }
+    else if (cards[0].suit == cards[1].suit) {
         vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
         return result;
-    } else if (((static_cast<int>(cards[0].rank) == static_cast<int>(cards[1].rank) + 1) && (cards[1].rank > HoldEmRank::Three)) || ((static_cast<int>(cards[1].rank) == static_cast<int>(cards[0].rank) + 1) && (cards[0].rank > HoldEmRank::Three))) {
+    }
+    else if (((static_cast<int>(cards[0].rank) == static_cast<int>(cards[1].rank) + 1) && (cards[1].rank > HoldEmRank::Three)) || ((static_cast<int>(cards[1].rank) == static_cast<int>(cards[0].rank) + 1) && (cards[0].rank > HoldEmRank::Three))) {
         vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
         return result;
-    } else if (cards[0].rank == cards[1].rank) {
+    }
+    else if (cards[0].rank == cards[1].rank) {
         vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
         return result;
-    } else {
+    }
+    else {
         vector<HoldEmAction> result{ HoldEmAction::fold,HoldEmAction::fold };
         return result;
     }
-
 }
 
-void HoldEmGame::bet() {
-    if (this->state == HoldEmState::flop) {
-        size_t small_blind = (1 + dealer) % players.size();
-        size_t big_blind = (2 + dealer) % players.size();
-        scores[small_blind] -= 1;
-        scores[big_blind] -= 2;
-        input_scores[small_blind] += 1;
-        input_scores[big_blind] += 2;
-    }
 
+vector<HoldEmAction> HoldEmGame::action_after_turn(const HoldEmGame::PlayerHand& playerHands) {
+    if (this->state == HoldEmState::turn) {
+        if (static_cast<int>(playerHands.rank) > 2) {
+            vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::raise };
+            return result;
+        }
+        else if (playerHands.rank == HoldEmHandRank::twopair) {
+            vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::call };
+            return result;
+        }
+        else if (playerHands.rank == HoldEmHandRank::pair) {   //four consecutive cards WIP
+            vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
+            return result;
+        }
+        else {
+            vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::fold };
+            return result;
+        }
+    }
+    else if (this->state == HoldEmState::river) {
+        if (static_cast<int>(playerHands.rank) > 3) {
+            vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::raise };
+            return result;
+        }
+        else if (playerHands.rank == HoldEmHandRank::threeofakind) {
+            vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::call };
+            return result;
+        }
+        else if (playerHands.rank == HoldEmHandRank::twopair || playerHands.rank == HoldEmHandRank::pair) {   //four consecutive cards WIP
+            vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
+            return result;
+        }
+        else {
+            vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::fold };
+            return result;
+        }
+    }
+    else {
+        if (static_cast<int>(playerHands.rank) > 3) {
+            vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::raise };
+            return result;
+        }
+        else if (playerHands.rank == HoldEmHandRank::threeofakind) {
+            vector<HoldEmAction> result{ HoldEmAction::raise,HoldEmAction::call };
+            return result;
+        }
+        else if (playerHands.rank == HoldEmHandRank::twopair) {
+            vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::call };
+            return result;
+        }
+        else {
+            vector<HoldEmAction> result{ HoldEmAction::call,HoldEmAction::fold };
+            return result;
+        }
+    }
+}
+
+bool HoldEmGame::bet() {
+
+    int min_raise_value;
+    if (this->state == HoldEmState::flop || this->state == HoldEmState::turn) {
+        min_raise_value = 2;
+    }
+    else {
+        min_raise_value = 4;
+    }
+    long unsigned int foldCount;
     bool flag = true;
     bool raiseFlag = false;
-    int largest_bet_of_round = 100; //initiate a value for the largest bet of the round
+    int largest_bet_of_round = 1000; //initiate a value for the largest bet of the round
     while (flag == true) {
+        foldCount = 0;
+        std::fill(input_scores.begin(), input_scores.end(), 0);
+        if (this->state == HoldEmState::flop) {
+            size_t small_blind = (1 + dealer) % players.size();
+            size_t big_blind = (2 + dealer) % players.size();
+            scores[small_blind] -= 1;
+            scores[big_blind] -= 2;
+            input_scores[small_blind] += 1;
+            input_scores[big_blind] += 2;
+            pot = 3;
+        }
+
+        //will remove later
         for (auto i : scores)
             std::cout << i << ' ';
+
         long unsigned int totalPass = 0;
         int largest_bet; // largest value for call/raise check max value
         for (size_t k = 0; k < players.size(); ++k) {
-            size_t i = (k + dealer + 3) % players.size();
+
+            size_t i;
+            if (this->state == HoldEmState::flop) {  // if its preflop, we want UTG go first
+                i = (k + dealer + 3) % players.size();
+            }
+            else {  //we want small blind go first if possible
+                i = (k + dealer + 1) % players.size();
+            }
 
             if (playerStatus[i] == false || input_scores[i] == largest_bet_of_round || scores[i] == 0) //will pass if conditions satisfy
                 continue;
 
             cout << "Player " << i << ", Please input your action, choose from 'fold','call','raise'." << endl;
-            vector<HoldEmAction> handAction = action(hands[i]);
+            vector<HoldEmAction> handAction;
+            if (this->state == HoldEmState::flop) {
+                handAction = action_before_turn(hands[i]);
+            }
+            else {
+                handAction = action_after_turn(phs[i]);
+            }
+
             HoldEmAction playerAction;
             if (raiseFlag == false) {
                 playerAction = handAction[0];
-            } else {
+            }
+            else {
                 playerAction = handAction[1];
             }
 
             if (playerAction == HoldEmAction::fold) {
+                foldCount++;
                 playerStatus[i] = false;
-                cout << "Player " << i << " folded." << endl;
-            } else if (playerAction == HoldEmAction::call) {
+                cout << "Player " << i << " folded." << foldCount << " " << players.size() << endl;
+                if (foldCount == (players.size() - 1)) {  //if all other than 1 player folded, end the game.                    
+                    for (size_t j = 0; j < players.size(); ++j) {
+                        if (playerStatus[j] == true) {
+                            scores[j] += pot;
+                            cout << "player " << players[j] << " win this pot with " << pot << " scores." << endl;
+                        }
+                    }
+                    return 1;
+                }
+            }
+            else if (playerAction == HoldEmAction::call) {
                 largest_bet = *max_element(std::begin(input_scores), std::end(input_scores));
                 if (scores[i] <= largest_bet) {
                     pot = pot + scores[i];
                     input_scores[i] = scores[i];
                     scores[i] = 0;
-                } else {
+                }
+                else {
                     pot = pot - input_scores[i] + largest_bet;
                     scores[i] = scores[i] + input_scores[i] - largest_bet;
                     input_scores[i] = largest_bet;
@@ -132,7 +237,8 @@ void HoldEmGame::bet() {
                 }
                 cout << "Player " << i << " successfully called." << endl;
                 cout << "Player " << i << " left with " << scores[i] << "." << endl;
-            } else if (playerAction == HoldEmAction::raise) {
+            }
+            else if (playerAction == HoldEmAction::raise) {
                 raiseFlag = true;
                 largest_bet = *max_element(std::begin(input_scores), std::end(input_scores));
                 if (scores[i] <= largest_bet) {
@@ -140,24 +246,17 @@ void HoldEmGame::bet() {
                     pot = pot + scores[i];
                     input_scores[i] = scores[i];
                     scores[i] = 0;
-                } else {
+                }
+                else {
                     cout << "Player " << i << ", please bet. You can bet from 0 to " << scores[i] << endl;
                     int betInput;
-                    if (this->state == HoldEmState::preflop) {
-                        while (true) {
-                            cin >> betInput;
-                            if (betInput <= scores[i] && betInput >= 2) {
-                                break;
-                            }
-                        }
-                    } else {
-                        while (true) {
-                            cin >> betInput;
-                            if (betInput <= scores[i] && betInput >= 4) {
-                                break;
-                            }
+                    while (true) {
+                        cin >> betInput;
+                        if (betInput <= scores[i] && betInput >= min_raise_value) {
+                            break;
                         }
                     }
+
                     pot = pot + betInput;
                     scores[i] = scores[i] - betInput;
                     input_scores[i] = input_scores[i] + betInput;
@@ -165,10 +264,22 @@ void HoldEmGame::bet() {
                     cout << "Player " << i << " successfully bet " << betInput << endl;
                 }
 
-            } else {
+            }
+            else {
                 cout << "Wrong input key. usage: Please input your action, choose from 'fold','call','raise'.";
                 this->bet();
             }
+        }
+
+
+        if (foldCount == (players.size() - 1)) {  //if all other than 1 player folded, end the game.                    
+            for (size_t j = 0; j < players.size(); ++j) {
+                if (playerStatus[j] == true) {
+                    scores[j] += pot;
+                    cout << "player " << players[j] << " win this pot with " << pot << " scores." << endl;
+                }
+            }
+            return 1;
         }
 
         // check if can end the loop
@@ -185,6 +296,14 @@ void HoldEmGame::bet() {
         if (totalPass == players.size())
             flag = false;
     }
+    return 0;
+}
+
+void HoldEmGame::reset() {
+    std::fill(input_scores.begin(), input_scores.end(), 0);
+    std::fill(playerStatus.begin(), playerStatus.end(), true);
+    this->phs = {};
+    this->pot = 0;
 }
 
 void HoldEmGame::collectAll() {
@@ -201,12 +320,14 @@ void HoldEmGame::print(std::ostream& os, const std::size_t rc) {
     size_t numPlayer = players.size();
     // print each player's status
     for (size_t i = 0; i < numPlayer; ++i) {
-        os << "player name: " << players[i];
-        if (i == dealer) {
-            os << "*";
+        if (playerStatus[i] == true) {
+            os << "player name: " << players[i];
+            if (i == dealer) {
+                os << "*";
+            }
+            os << std::endl;
+            hands[i].print(os, rc);
         }
-        os << std::endl;
-        hands[i].print(os, rc);
     }
 }
 
@@ -246,7 +367,8 @@ void HoldEmGame::evalCombinations(CardSet<HoldEmRank, Suit>& handCards, CardSet<
             for (int j = 0; j <= lastPos; ++j) {
                 tmp.push_back(1 << j);
             }
-        } else {
+        }
+        else {
             for (int prevCombo : combos) {
                 for (int j = lastPos; ((1 << j) & prevCombo) == 0; --j) {
                     tmp.push_back((1 << j) | prevCombo);
@@ -259,7 +381,7 @@ void HoldEmGame::evalCombinations(CardSet<HoldEmRank, Suit>& handCards, CardSet<
     for (int combo : combos) {
         HoldEmGame::PlayerHand tmpPH(cset, playerHand.name, HoldEmHandRank::undefined);
         std::vector<Card<HoldEmRank, Suit>>& phVec = tmpPH.cards.*pdata;
-        for (int i = 0; i < restCards.size(); ++i) {
+        for (size_t i = 0; i < restCards.size(); ++i) {
             if (combo & (1 << i)) continue;
             phVec.push_back(restCards[i]);
         }
@@ -275,46 +397,47 @@ void HoldEmGame::printPlayerHand(std::ostream& os, std::vector<HoldEmGame::Playe
     sort(playerHands.begin(), playerHands.end());
     reverse(playerHands.begin(), playerHands.end());
     for (auto& [cst, nid, rank] : playerHands) {
-        cout << "Player: " << players[nid] << endl;
-        cst.print(cout, boardWidth);
-        cout << "Hand rank: " << rank << endl;
+        if (playerStatus[nid] == true) {
+            cout << "Player: " << players[nid] << endl;
+            cst.print(cout, boardWidth);
+            cout << "Hand rank: " << rank << endl;
+        }
     }
 }
-
 
 std::ostream& operator<<(std::ostream& os, const HoldEmHandRank& herank) {
     string label;
     switch (herank) {
-        case HoldEmHandRank::xhigh:
-            label = "xhigh";
-            break;
-        case HoldEmHandRank::pair:
-            label = "pair";
-            break;
-        case HoldEmHandRank::twopair:
-            label = "twopair";
-            break;
-        case HoldEmHandRank::threeofakind:
-            label = "threeofakind";
-            break;
-        case HoldEmHandRank::straight:
-            label = "straight";
-            break;
-        case HoldEmHandRank::flush:
-            label = "flush";
-            break;
-        case HoldEmHandRank::fullhouse:
-            label = "fullhouse";
-            break;
-        case HoldEmHandRank::fourofakind:
-            label = "fourofakind";
-            break;
-        case HoldEmHandRank::straightflush:
-            label = "straightflush";
-            break;
-        default:
-            label = "undefined";
-            break;
+    case HoldEmHandRank::xhigh:
+        label = "xhigh";
+        break;
+    case HoldEmHandRank::pair:
+        label = "pair";
+        break;
+    case HoldEmHandRank::twopair:
+        label = "twopair";
+        break;
+    case HoldEmHandRank::threeofakind:
+        label = "threeofakind";
+        break;
+    case HoldEmHandRank::straight:
+        label = "straight";
+        break;
+    case HoldEmHandRank::flush:
+        label = "flush";
+        break;
+    case HoldEmHandRank::fullhouse:
+        label = "fullhouse";
+        break;
+    case HoldEmHandRank::fourofakind:
+        label = "fourofakind";
+        break;
+    case HoldEmHandRank::straightflush:
+        label = "straightflush";
+        break;
+    default:
+        label = "undefined";
+        break;
     }
     return os << label;
 }
@@ -326,22 +449,35 @@ int HoldEmGame::play() {
     while (true) {
         // shuffle card set state to preflop
         deck.shuffle();
-
+        this->reset();
         this->state = HoldEmState::preflop;
         this->pot = 0;
 
         // deal the card to players
         this->deal();
         // print each player info and hand
-
         print(cout, HANDCARD_NUM);
-        this->bet();
+
+        //bool this->bet();
+        //betResult = this->bet();
+        if (this->bet() == 1) {
+            collectAll();
+
+            if (askForStop(cout, cin)) {
+                return STOP;
+            }
+
+            dealer = (dealer + 1) % players.size();
+            continue;
+        }
+
         // deal 3 flop cards to board
         this->deal();
+
         cout << "BOARD (flop): ";
         board.print(cout, boardWidth);
 
-        vector<HoldEmGame::PlayerHand> phs;
+        //vector<HoldEmGame::PlayerHand> phs;
         for (size_t i = 0; i < players.size(); ++i) {
             phs.emplace_back(hands[i], i, HoldEmHandRank::undefined);
         }
@@ -354,11 +490,21 @@ int HoldEmGame::play() {
             }
             phs[i].rank = holdem_hand_evaluation(phs[i].cards);
         }
-
         this->printPlayerHand(cout, phs);
+        if (this->bet() == 1) {
+            collectAll();
+
+            if (askForStop(cout, cin)) {
+                return STOP;
+            }
+
+            dealer = (dealer + 1) % players.size();
+            continue;
+        }
 
         // deal turn cards to board
         this->deal();
+
         cout << "BOARD (turn): ";
         board.print(cout, boardWidth);
 
@@ -366,6 +512,16 @@ int HoldEmGame::play() {
             evalCombinations(hands[phs[i].name], board, phs[i]);
         }
         this->printPlayerHand(cout, phs);
+        if (this->bet() == 1) {
+            collectAll();
+
+            if (askForStop(cout, cin)) {
+                return STOP;
+            }
+
+            dealer = (dealer + 1) % players.size();
+            continue;
+        }
 
         // deal river cards to board
         this->deal();
@@ -376,7 +532,16 @@ int HoldEmGame::play() {
             evalCombinations(hands[phs[i].name], board, phs[i]);
         }
         this->printPlayerHand(cout, phs);
+        if (this->bet() == 1) {
+            collectAll();
 
+            if (askForStop(cout, cin)) {
+                return STOP;
+            }
+
+            dealer = (dealer + 1) % players.size();
+            continue;
+        }
         // collect hands and board
         collectAll();
 
@@ -415,85 +580,87 @@ bool operator<(const HoldEmGame::PlayerHand& lhs, const HoldEmGame::PlayerHand& 
         HoldEmRank lpair = HoldEmRank::undefined, rpair = lpair;
         switch (lhs.rank) {
             // for flush and xhigh, we treat them as same because of we only need to find & compare the largest rank
-            case HoldEmHandRank::flush:
-            case HoldEmHandRank::xhigh:
-                lpair = lcs.back().rank;
-                rpair = rcs.back().rank;
-                if (lpair == rpair) {
-                    lcs.pop_back();
-                    rcs.pop_back();
-                    HoldEmGame::PlayerHand lsub(lcopy, lhs.name, HoldEmHandRank::xhigh), rsub(rcopy, rhs.name, HoldEmHandRank::xhigh);
-                    return lsub < rsub;
+        case HoldEmHandRank::flush:
+        case HoldEmHandRank::xhigh:
+            lpair = lcs.back().rank;
+            rpair = rcs.back().rank;
+            if (lpair == rpair) {
+                lcs.pop_back();
+                rcs.pop_back();
+                HoldEmGame::PlayerHand lsub(lcopy, lhs.name, HoldEmHandRank::xhigh), rsub(rcopy, rhs.name, HoldEmHandRank::xhigh);
+                return lsub < rsub;
+            }
+            break;
+            // for pair family, we recursively degrade the comparison if they have same rank
+        case HoldEmHandRank::pair:
+        case HoldEmHandRank::twopair:
+        {
+            // index of last element 
+            int lix = lcs.size() - 1, rix = rcs.size() - 1;
+            // reversely traversal, to find largest rank
+            for (; lix > 0;) {
+                lpair = lcs[lix--].rank;
+                if (lcs[lix].rank == lpair) { break; }
+            }
+            for (; rix > 0;) {
+                rpair = lcs[rix--].rank;
+                if (rcs[rix].rank == rpair) { break; }
+            }
+            if (lpair == rpair) {
+                lcs.erase(lcs.begin() + lix, lcs.begin() + lix + LENGTH_OF_PAIR);
+                rcs.erase(rcs.begin() + rix, rcs.begin() + rix + LENGTH_OF_PAIR);
+                HoldEmHandRank nxtrank = lhs.rank == HoldEmHandRank::twopair ? HoldEmHandRank::pair : HoldEmHandRank::xhigh;
+                HoldEmGame::PlayerHand lsub(lcopy, lhs.name, nxtrank), rsub(rcopy, rhs.name, nxtrank);
+                return lsub < rsub;
+            }
+            break;
+        }
+        case HoldEmHandRank::threeofakind:
+        case HoldEmHandRank::fullhouse:
+        case HoldEmHandRank::fourofakind:
+            for (auto pit = lcs.rbegin(), sit = lcs.rbegin(); sit != lcs.rend(); ++sit) {
+                if (sit->rank != lpair) {
+                    lpair = sit->rank;
+                    pit = sit;
                 }
-                break;
-                // for pair family, we recursively degrade the comparison if they have same rank
-            case HoldEmHandRank::pair:
-            case HoldEmHandRank::twopair:
-                {
-                    // index of last element 
-                    int lix = lcs.size() - 1, rix = rcs.size() - 1;
-                    // reversely traversal, to find largest rank
-                    for (; lix > 0;) {
-                        lpair = lcs[lix--].rank;
-                        if (lcs[lix].rank == lpair) { break; }
-                    }
-                    for (; rix > 0;) {
-                        rpair = lcs[rix--].rank;
-                        if (rcs[rix].rank == rpair) { break; }
-                    }
-                    if (lpair == rpair) {
-                        lcs.erase(lcs.begin() + lix, lcs.begin() + lix + LENGTH_OF_PAIR);
-                        rcs.erase(rcs.begin() + rix, rcs.begin() + rix + LENGTH_OF_PAIR);
-                        HoldEmHandRank nxtrank = lhs.rank == HoldEmHandRank::twopair ? HoldEmHandRank::pair : HoldEmHandRank::xhigh;
-                        HoldEmGame::PlayerHand lsub(lcopy, lhs.name, nxtrank), rsub(rcopy, rhs.name, nxtrank);
-                        return lsub < rsub;
-                    }
-                    break;
-                }
-            case HoldEmHandRank::threeofakind:
-            case HoldEmHandRank::fullhouse:
-            case HoldEmHandRank::fourofakind:
-                for (auto pit = lcs.rbegin(), sit = lcs.rbegin(); sit != lcs.rend(); ++sit) {
-                    if (sit->rank != lpair) {
-                        lpair = sit->rank;
-                        pit = sit;
-                    } else {
-                        if (pit - sit > LENGTH_OF_PAIR) {
-                            break;
-                        }
-                    }
-                }
-                for (auto pit = rcs.rbegin(), sit = rcs.rbegin(); sit != rcs.rend(); ++sit) {
-                    if (sit->rank != rpair) {
-                        rpair = sit->rank;
-                        pit = sit;
-                    } else {
-                        if (pit - sit > LENGTH_OF_PAIR) {
-                            break;
-                        }
+                else {
+                    if (pit - sit > LENGTH_OF_PAIR) {
+                        break;
                     }
                 }
-                break;
-            case HoldEmHandRank::straight:
-            case HoldEmHandRank::straightflush:
-                lpair = lcs.back().rank;
-                rpair = rcs.back().rank;
+            }
+            for (auto pit = rcs.rbegin(), sit = rcs.rbegin(); sit != rcs.rend(); ++sit) {
+                if (sit->rank != rpair) {
+                    rpair = sit->rank;
+                    pit = sit;
+                }
+                else {
+                    if (pit - sit > LENGTH_OF_PAIR) {
+                        break;
+                    }
+                }
+            }
+            break;
+        case HoldEmHandRank::straight:
+        case HoldEmHandRank::straightflush:
+            lpair = lcs.back().rank;
+            rpair = rcs.back().rank;
 
-                if (lpair == HoldEmRank::Ace) {
-                    lcs.pop_back();
-                    if (lcs.back().rank != HoldEmRank::King) {
-                        lpair = lcs.back().rank;
-                    }
+            if (lpair == HoldEmRank::Ace) {
+                lcs.pop_back();
+                if (lcs.back().rank != HoldEmRank::King) {
+                    lpair = lcs.back().rank;
                 }
-                if (rpair == HoldEmRank::Ace) {
-                    rcs.pop_back();
-                    if (rcs.back().rank != HoldEmRank::King) {
-                        rpair = rcs.back().rank;
-                    }
+            }
+            if (rpair == HoldEmRank::Ace) {
+                rcs.pop_back();
+                if (rcs.back().rank != HoldEmRank::King) {
+                    rpair = rcs.back().rank;
                 }
-                break;
-            default:
-                break;
+            }
+            break;
+        default:
+            break;
         }
         return lpair < rpair;
     }
@@ -543,30 +710,31 @@ HoldEmHandRank HoldEmGame::holdem_hand_evaluation(const CardSet<HoldEmRank, Suit
             }
             int num = rankcounts[i];
             switch (num) {
-                case LENGTH_OF_FOUR:
-                    hrmask |= (1 << static_cast<int>(HoldEmHandRank::fourofakind));
-                    break;
-                case LENGTH_OF_THREE:
-                    hrmask |= (1 << static_cast<int>(HoldEmHandRank::threeofakind));
-                    if (hrmask & (1 << static_cast<int>(HoldEmHandRank::pair))) {
-                        hrmask |= (1 << static_cast<int>(HoldEmHandRank::fullhouse));
-                    }
-                    break;
-                case LENGTH_OF_PAIR:
-                    if (hrmask & (1 << static_cast<int>(HoldEmHandRank::pair))) {
+            case LENGTH_OF_FOUR:
+                hrmask |= (1 << static_cast<int>(HoldEmHandRank::fourofakind));
+                break;
+            case LENGTH_OF_THREE:
+                hrmask |= (1 << static_cast<int>(HoldEmHandRank::threeofakind));
+                if (hrmask & (1 << static_cast<int>(HoldEmHandRank::pair))) {
+                    hrmask |= (1 << static_cast<int>(HoldEmHandRank::fullhouse));
+                }
+                break;
+            case LENGTH_OF_PAIR:
+                if (hrmask & (1 << static_cast<int>(HoldEmHandRank::pair))) {
 
-                        hrmask |= (1 << static_cast<int>(HoldEmHandRank::twopair));
+                    hrmask |= (1 << static_cast<int>(HoldEmHandRank::twopair));
 
-                    }
-                    hrmask |= (1 << static_cast<int>(HoldEmHandRank::pair));
-                    if (hrmask & (1 << static_cast<int>(HoldEmHandRank::threeofakind))) {
-                        hrmask |= (1 << static_cast<int>(HoldEmHandRank::fullhouse));
-                    }
-                    break;
-                default:
-                    break;
+                }
+                hrmask |= (1 << static_cast<int>(HoldEmHandRank::pair));
+                if (hrmask & (1 << static_cast<int>(HoldEmHandRank::threeofakind))) {
+                    hrmask |= (1 << static_cast<int>(HoldEmHandRank::fullhouse));
+                }
+                break;
+            default:
+                break;
             }
-        } else {
+        }
+        else {
             cnt = 0;
         }
     }
