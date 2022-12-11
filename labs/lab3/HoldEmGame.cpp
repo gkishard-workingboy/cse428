@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.cpp
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-09 22:37:02
+ * @LastEditTime: 2022-12-10 18:32:36
  * @Description: Definition to HoldEmGame.h
  *
  */
@@ -38,6 +38,8 @@ void HoldEmGame::deal() {
             }
         }
         this->state = HoldEmState::flop;
+        // after each player has been dealt 2 cards, the pot should be set to 0 
+        this->pot = 0;
     } else if (this->state == HoldEmState::flop) {
         for (size_t i = 0; i < flopCards; i++) {
             deck >> board;
@@ -281,6 +283,58 @@ void HoldEmGame::printPlayerHand(std::ostream& os, std::vector<HoldEmGame::Playe
     }
 }
 
+void HoldEmGame::settleRound(std::vector<HoldEmGame::PlayerHand>& allPlayerHands) {
+    using PH = HoldEmGame::PlayerHand;
+    PH& bestHand = allPlayerHands.front();
+    // number of equal valued hand players
+    size_t eqNum = 1;
+    for (; eqNum < allPlayerHands.size(); ++eqNum) {
+        // if next player's hand is same as the best, keep looping
+        if (bestHand == allPlayerHands[eqNum]) continue;
+        // otherwise break the loop
+        break;
+    }
+    int remainder = pot % eqNum;
+    int won = pot / eqNum;
+
+    for (size_t i = 0; i < eqNum; ++i) {
+        int ci = allPlayerHands[i].name;
+        scores[ci] += won;
+    }
+    if (remainder > 0) {
+        // if we have a remainder under such pot, the remainder should go to the player in an earlier dealing place. And the way to judge is through comparing of the index of that player in accordance with the dealer's position.
+        int earliestIndex = static_cast<int>(2 * dealer), minDist = static_cast<int>(2 * dealer);
+        for (size_t i = 0; i < eqNum; ++i) {
+            int ci = allPlayerHands[i].name;
+            int dis = ci < static_cast<int>(dealer) ? players.size() - dealer + ci : ci - dealer;
+            if (minDist > dis) {
+                minDist = dis;
+                earliestIndex = ci;
+            }
+        }
+        scores[ci] += remainder;
+    }
+    // reset pot to zero
+    pot = 0;
+
+    vector<unsigned int> newScores;
+    vector<string> newPlayers;
+    // clear any losers
+    for (size_t i = 0; i <= players.size(); ++i) {
+        // lose all their scores (probably money:()
+        if (scores[i] == 0) {
+            playerRank.push_back(players[i]);
+            // need to update the value of dealer, since someone before him lose his place.
+            if (i <= dealer) dealer--;
+        } else {
+            newScores.push_back(scores[i]);
+            newPlayers.push_back(players[i]);
+        }
+    }
+    players = move(newPlayers);
+    scores = move(newScores);
+}
+
 
 std::ostream& operator<<(std::ostream& os, const HoldEmHandRank& herank) {
     string label;
@@ -328,12 +382,16 @@ int HoldEmGame::play() {
         deck.shuffle();
 
         this->state = HoldEmState::preflop;
-        this->pot = 0;
 
         // deal the card to players
         this->deal();
-        // print each player info and hand
+        // init all player's hand
+        vector<HoldEmGame::PlayerHand> phs;
+        for (size_t i = 0; i < players.size(); ++i) {
+            phs.emplace_back(hands[i], i, HoldEmHandRank::undefined);
+        }
 
+        // print each player info and hand
         print(cout, HANDCARD_NUM);
         this->bet();
         // deal 3 flop cards to board
@@ -341,10 +399,7 @@ int HoldEmGame::play() {
         cout << "BOARD (flop): ";
         board.print(cout, boardWidth);
 
-        vector<HoldEmGame::PlayerHand> phs;
-        for (size_t i = 0; i < players.size(); ++i) {
-            phs.emplace_back(hands[i], i, HoldEmHandRank::undefined);
-        }
+
         for (size_t i = 0; i < phs.size(); ++i) {
             // copy constructor, would not affect board.
             CardSet<HoldEmRank, Suit> tmpcs(board);
@@ -576,4 +631,8 @@ HoldEmHandRank HoldEmGame::holdem_hand_evaluation(const CardSet<HoldEmRank, Suit
             hrk = static_cast<HoldEmHandRank>(rk);
     }
     return hrk;
+}
+
+bool operator==(const HoldEmGame::PlayerHand& lhs, const HoldEmGame::PlayerHand& rhs) {
+    return !(lhs < rhs) && !(rhs < lhs);
 }

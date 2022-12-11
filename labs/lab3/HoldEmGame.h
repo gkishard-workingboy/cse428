@@ -2,7 +2,7 @@
  * @FilePath: /428cpp/labs/lab3/HoldEmGame.h
  * @Author: Zhikuan Wei w.zhikuan@wustl.edu
  * @Date: 2022-10-02 19:55:59
- * @LastEditTime: 2022-12-09 22:10:01
+ * @LastEditTime: 2022-12-10 18:24:19
  * @Description: Declaration for Hold'Em Game states and class.
  *
  */
@@ -71,9 +71,9 @@ protected:
 	HoldEmDeck deck;
 	std::vector<CardSet<HoldEmRank, Suit>> hands;
 	CardSet<HoldEmRank, Suit> board;
-	std::vector<int> scores;
 	std::vector<int> input_scores;
 	std::vector<bool> playerStatus;
+	std::vector<std::string> playerRank;
 
 	virtual void deal();
 	void bet();
@@ -85,9 +85,11 @@ protected:
 	bool askForStop(std::ostream&, std::istream&);
 	void evalCombinations(CardSet<HoldEmRank, Suit>&, CardSet<HoldEmRank, Suit>, HoldEmGame::PlayerHand&);
 	void printPlayerHand(std::ostream&, std::vector<HoldEmGame::PlayerHand>&);
+	void settleRound(std::vector<HoldEmGame::PlayerHand>&);
 };
 
 std::ostream& operator<<(std::ostream&, const HoldEmHandRank&);
 bool operator<(const HoldEmGame::PlayerHand&, const HoldEmGame::PlayerHand&);
+bool operator==(const HoldEmGame::PlayerHand&, const HoldEmGame::PlayerHand&);
 
 #endif // _HOLDEMGAME_H
