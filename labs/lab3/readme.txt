@@ -166,6 +166,9 @@ QC 10C 9H 9D 9H QD AD JS
 Melds:  dix 10
 misdeal, re-dealing cards...
 
+
+>>> Do you wish to stop playing? (yes/*) 
+
 Here are some additional examples of outputs we got when playing:
 
 In the output below, p2 is found to have two offsuitmarriage since they have two pair of Queen and King but both are not of trump suit. p4 got one insuitmarriage and a dix, so team 2 won the contract, and they played alligned with strategy we made during trick, and finally won the points as same value as their bid.
